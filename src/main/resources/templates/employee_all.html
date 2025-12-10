@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Employees | Saravana Bhavan</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+        }
+
+        .table-card {
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .brand-title {
+            letter-spacing: 2px;
+        }
+
+        .table thead {
+            background: linear-gradient(90deg, #0891b2, #06b6d4);
+            color: white;
+        }
+
+        .table tbody tr {
+            transition: 0.3s;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(8, 145, 178, 0.15);
+            transform: scale(1.01);
+        }
+
+        footer {
+            margin-top: 40px;
+            width: 100%;
+            height: 50px;
+            background-color: #0f172a;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ✅ NAVBAR -->
+<nav class="d-flex align-items-center justify-content-between px-5 py-3"
+     style="background: linear-gradient(90deg, #0891b2, #06b6d4);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+
+    <h2 class="text-white fw-bold m-0 brand-title">
+        ALL EMPLOYEES
+    </h2>
+
+    <a href="/employee_dash"
+       class="btn btn-dark btn-sm fw-bold">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</nav>
+
+<!-- ✅ MAIN CONTAINER -->
+<div class="container mt-4">
+
+    <!-- ✅ SEARCH UI (optional filter look) -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control"
+                   placeholder="🔍 Search employee (UI only)">
+        </div>
+    </div>
+
+    <!-- ✅ TABLE CARD -->
+    <div class="card shadow-lg p-4 table-card">
+
+        <h4 class="text-center mb-4 text-primary fw-bold">
+            <i class="bi bi-people-fill"></i> Employee List
+        </h4>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead>
+                <tr>
+                    <th><i class="bi bi-hash"></i> ID</th>
+                    <th><i class="bi bi-person-fill"></i> NAME</th>
+                    <th><i class="bi bi-envelope-fill"></i> EMAIL</th>
+                    <th><i class="bi bi-telephone-fill"></i> CELL</th>
+                    <th><i class="bi bi-shield-lock-fill"></i> ROLE</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="e : ${all_emp}">
+                    <td th:text="${e.emp_id}"></td>
+                    <td th:text="${e.emp_name}"></td>
+                    <td th:text="${e.emp_email}"></td>
+                    <td th:text="${e.emp_cell}"></td>
+                    <td>
+                        <span class="badge bg-success"
+                              th:text="${e.emp_role}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ✅ FOOTER -->
+<footer>
+    &copy; 2025 Saravana FOOD | Designed by You
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

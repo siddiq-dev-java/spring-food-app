@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Dashboard | Saravana Bhavan</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+
+        .dash-card {
+            width: 420px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.95);
+            animation: fadeIn 0.8s ease;
+        }
+
+        .brand-title {
+            letter-spacing: 2px;
+        }
+
+        .btn-dash {
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-dash:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+        }
+
+        footer {
+            width: 100%;
+            height: 50px;
+            background-color: #0f172a;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ✅ NAVBAR -->
+<nav class="d-flex align-items-center justify-content-between px-5 py-3"
+     style="background: linear-gradient(90deg, #0891b2, #06b6d4);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+
+    <h2 class="text-white fw-bold m-0 brand-title">
+        EMPLOYEE DASHBOARD
+    </h2>
+
+    <a href="/emp_logout"
+       class="btn btn-danger btn-sm fw-bold"
+       onclick="return confirm('Are you sure you want to logout?')">
+        <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+</nav>
+
+<!-- ✅ SUCCESS MESSAGE -->
+<div class="container mt-3">
+    <div th:if="${msg}" class="alert alert-success text-center fw-bold">
+        <span th:text="${msg}"></span>
+    </div>
+</div>
+
+<!-- ✅ DASHBOARD CARD -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-5 text-center dash-card">
+
+        <h4 class="mb-4 text-primary fw-bold">
+            Welcome, <span th:text="${emp_name}">Admin</span> 👋
+        </h4>
+
+        <p class="text-muted mb-4 fw-semibold">
+            Choose Your Option
+        </p>
+
+        <!-- ✅ ALL EMP -->
+        <a href="/employee_all"
+           class="btn btn-primary btn-lg mb-3 w-100 btn-dash">
+            <i class="bi bi-people-fill"></i> All Employees
+        </a>
+
+        <!-- ✅ FOOD -->
+        <a href="/food"
+           class="btn btn-info btn-lg mb-3 w-100 btn-dash">
+            <i class="bi bi-egg-fried"></i> Food Menu
+        </a>
+
+        <!-- ✅ EMP RESET -->
+        <a href="/emp_reset"
+           class="btn btn-danger btn-lg w-100 btn-dash">
+            <i class="bi bi-arrow-counterclockwise"></i> Employee Reset
+        </a>
+
+    </div>
+</div>
+
+<!-- ✅ FOOTER -->
+<footer>
+    &copy; 2025 Saravana FOOD | Designed by You
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
