@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springBoot.saravana_bhavan.DTO.customer_signup_dto;
+import com.springBoot.saravana_bhavan.DTO.employee_signup_dto;
 import com.springBoot.saravana_bhavan.DTO.customer_login_dto;
 import com.springBoot.saravana_bhavan.REPO.customer_repository;
 import com.springBoot.saravana_bhavan.project_help.AES;
@@ -147,6 +148,39 @@ public class customer_cont {
 	        redirectAttributes.addFlashAttribute("msg", "Logout Successfully");
 	        return "redirect:/customer_login";
 	  }
+	    
+	    @GetMapping("/customer_reset")
+	    public String showCustomerReset( Model model) {
+
+	        model.addAttribute("customer_signup_dto", new customer_signup_dto());
+	        model.addAttribute("res","WELCOME");
+	        return "customer_reset"; 
+	    }
+
+//	    @GetMapping("/emp_reset")
+//	     public String empReset(Model model) {
+//	    
+//	        model.addAttribute("employee_signup_dto", new employee_signup_dto());
+//	        model.addAttribute("res", "");
+//	         return "emp_reset";
+//	     }
+//	        
+
+	    @PostMapping("/customer_reset")
+	    public String customer_reset(HttpSession session, Model model,
+	                                 RedirectAttributes redirectAttributes) {
+
+	        String cus_cell = (String) session.getAttribute("cus_cell");
+
+	        if (cus_cell == null) {
+	            redirectAttributes.addFlashAttribute("res", "please login--");
+	            return "redirect:/customer_login";
+	        }
+
+	        return "customer_dash";
+	    }
+
+	    
 	}
 	       
 
