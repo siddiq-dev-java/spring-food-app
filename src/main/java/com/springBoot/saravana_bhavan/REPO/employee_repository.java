@@ -168,7 +168,20 @@ import jakarta.persistence.EntityManager;
 						.getResultList();
 			
 			}
-		    	
+
+
+
+			public List<employee_model> emp_admin() {
+
+			    return entityManager
+			            .createQuery(
+			                "from employee_model where emp_role = :role",
+			                employee_model.class
+			            )
+			            .setParameter("role", "ADMIN")
+			            .getResultList();
+			}
+
 	    
 		
 		

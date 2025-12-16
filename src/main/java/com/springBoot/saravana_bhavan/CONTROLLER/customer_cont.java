@@ -2,6 +2,7 @@ package com.springBoot.saravana_bhavan.CONTROLLER;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +12,17 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springBoot.saravana_bhavan.DTO.customer_signup_dto;
-import com.springBoot.saravana_bhavan.DTO.employee_signup_dto;
+import com.springBoot.saravana_bhavan.DTO.customer_update_dto;
+import com.springBoot.saravana_bhavan.MODEL.customer_model;
+import com.springBoot.saravana_bhavan.MODEL.employee_model;
 import com.springBoot.saravana_bhavan.DTO.customer_login_dto;
 import com.springBoot.saravana_bhavan.REPO.customer_repository;
 import com.springBoot.saravana_bhavan.project_help.AES;
+import com.springBoot.saravana_bhavan.REPO.customer_repository;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -91,16 +96,16 @@ public class customer_cont {
 	        String cus_pass = AES.Encrypt(customer_login_dto.getCus_pass());
 	      
 
-	        Map<String, String> emp_log_res = customerRepository.customer_login(cus_cell, cus_pass);
+	        Map<String, String> cus_log_res = customerRepository.customer_login(cus_cell, cus_pass);
 
-	        if (emp_log_res == null || emp_log_res.get("result") == null) {
+	        if (cus_log_res == null || cus_log_res.get("result") == null) {
 	            model.addAttribute("msg", "Invalid cell num or Password");
 	            return "customer_login";
 	        }
 
-	        String res = emp_log_res.get("result");
-	        String cus_name = emp_log_res.get("cus_name");
-	        String cus_id = emp_log_res.get("cus_id");
+	        String res = cus_log_res.get("result");
+	        String cus_name = cus_log_res.get("cus_name");
+	        String cus_id = cus_log_res.get("cus_id");
 	        System.out.println(" SP RETURN RES = " + res);
 
 
@@ -119,7 +124,7 @@ public class customer_cont {
 	                return "redirect:/customer_dash";
 	            } 
 	            else {
-	                model.addAttribute("msg", "Only admin allowed");
+	                model.addAttribute("res", res);
 	                return "customer_login";
 	            }
 
@@ -157,14 +162,6 @@ public class customer_cont {
 	        return "customer_reset"; 
 	    }
 
-//	    @GetMapping("/emp_reset")
-//	     public String empReset(Model model) {
-//	    
-//	        model.addAttribute("employee_signup_dto", new employee_signup_dto());
-//	        model.addAttribute("res", "");
-//	         return "emp_reset";
-//	     }
-//	        
 
 	    @PostMapping("/customer_reset")
 	    public String customer_reset(HttpSession session, Model model,
@@ -178,6 +175,125 @@ public class customer_cont {
 	        }
 
 	        return "customer_dash";
+	    }
+	    
+	    
+	    
+	    
+	    @GetMapping("/customer_search")
+	    public String customer_search_get() {
+	        return "redirect:/customer_reset";
+	    }
+	    
+	    
+	    @PostMapping("/customer_search")
+	    public String customer_search(HttpSession session,Model model,
+	    		@RequestParam("cus_id")String cus_id) {
+	    	  Map<String, Object> response = customerRepository.customer_search(cus_id);
+	    	customer_model  cus = (customer_model)response.get("cus");
+	    	String resultmsg  = (String) response.get("res");
+	    	
+	    	if(cus!=null) {
+	    		customer_signup_dto dto = new customer_signup_dto();
+	    		dto.setCus_id(cus.getCus_id());
+	    		dto.setCus_name(cus.getCus_name());
+	    		dto.setCus_email(cus.getCus_email());
+	    		dto.setCus_cell(cus.getCus_cell());
+	    		String decryptedPass = AES.Decrypt(cus.getCus_pass());
+
+	    		System.out.println("Encrypted from DB: " + cus.getCus_pass());
+	    		System.out.println("Decrypted value   : " + decryptedPass);
+
+	    		dto.setCus_pass(cus_id);
+	    		
+	    		model.addAttribute("customer_signup_dto",dto);	
+	    	}
+	    	else {
+	    		model.addAttribute("customer_signup_dto", new customer_signup_dto() );
+	    		
+	    	}
+	    	model.addAttribute("res", resultmsg);
+	    	return "customer_reset";	
+	    }
+	    
+	    @PostMapping("/customer_update")
+	    public String customer_update(
+	            HttpSession session,
+	            @Valid @ModelAttribute("customer_update_dto") customer_update_dto dto,
+	            BindingResult result,
+	            RedirectAttributes redirectAttributes,
+	            Model model) {
+
+	        String cus_id = (String) session.getAttribute("cus_id");
+
+	        if (cus_id == null) {
+	            redirectAttributes.addFlashAttribute("msg", "Please login first");
+	            return "redirect:/customer_login";
+	        }
+
+	        if (result.hasErrors()) {
+	            return "customer_reset";
+	        }
+
+	        String cus_pass = AES.Encrypt(dto.getCus_pass());
+	        String idt = LocalDateTime.now()
+	                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+	        String res = customerRepository.customer_update(
+	                cus_id,
+	                dto.getCus_name(),
+	                dto.getCus_email(),
+	                dto.getCus_cell(),
+	                cus_pass,
+	                idt
+	        );
+
+	        System.out.println("UPDATE RESULT = " + res);
+
+	        redirectAttributes.addFlashAttribute("msg", res);
+	        return "redirect:/customer_reset";
+	    }
+	    
+	    
+	    
+	    @PostMapping("/customer_delete")
+	    public String employee_delete(HttpSession session,
+	    		Model model ,@RequestParam("cus_id")String cus_id) {
+	    	String response = customerRepository.customer_delete(cus_id);
+	    	
+	    	model.addAttribute("msg",response);
+	    	model.addAttribute("customer_signup_dto",new customer_signup_dto());
+	    	return "customer_reset";
+	    
+	    }
+	    
+	    
+	    
+	    
+	    @GetMapping("/customer_all")
+	    public String customer_all(HttpSession session,
+	                               Model model,
+	                               RedirectAttributes redirectAttributes) {
+
+	        String cus_name = (String) session.getAttribute("cus_name");
+
+	        if (cus_name == null) {
+	            redirectAttributes.addFlashAttribute("msg", "Please login first");
+	            return "redirect:/customer_login";
+	        }
+
+	        model.addAttribute("cus_name", cus_name);
+
+	        List<customer_model> all_cus = customerRepository .cus_all();
+
+	        for (customer_model c : all_cus) {
+	            String dec = AES.Decrypt(c.getCus_pass());
+	            c.setCus_pass(dec);
+	        }
+
+	        model.addAttribute("all_cus", all_cus);
+
+	        return "employee_all";
 	    }
 
 	    

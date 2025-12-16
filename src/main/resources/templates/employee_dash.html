@@ -122,6 +122,59 @@
     </div>
 </div>
 
+
+
+
+
+<!-- ✅ ALL CUSTOMERS LIST -->
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm" style="border-radius:18px;">
+
+        <div class="card-header text-center fw-bold"
+             style="background: linear-gradient(90deg,#38bdf8,#06b6d4);
+                    color:white;
+                    border-radius:18px 18px 0 0;">
+            👥 CUSTOMER LIST
+        </div>
+
+        <div class="card-body table-responsive p-4">
+            <table class="table align-middle text-center"
+                   style="border-collapse: separate; border-spacing: 0 10px;">
+
+                <thead>
+                <tr style="color:#475569;">
+                    <th>#</th>
+                    <th>Customer ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="c, stat : ${all_cus}"
+                    style="background:#f8fafc;
+                           border-radius:12px;
+                           box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+
+                    <td th:text="${stat.count}" class="fw-bold"></td>
+                    <td th:text="${c.cus_id}" class="text-primary fw-semibold"></td>
+                    <td th:text="${c.cus_name}"></td>
+                    <td th:text="${c.cus_email}" class="text-muted"></td>
+                    <td th:text="${c.cus_cell}" class="fw-semibold"></td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(all_cus)}">
+                    <td colspan="5" class="fw-bold text-danger py-3">
+                        No Customers Found
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <!-- ✅ FOOTER -->
 <footer>
     &copy; 2025 Saravana FOOD | Designed by You

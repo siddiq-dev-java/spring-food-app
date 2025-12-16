@@ -10,12 +10,12 @@ public class customer_model {
 	
 	@Id
 	private String cus_id;
-	private String cus_name;
-	private String emp_email;
-	private String emp_cell;
-	private String emp_pass;
 
-	
+	private String cus_name;
+	private String cus_email;
+	private String cus_cell;
+	private String cus_pass;
+
 	public String getCus_id() {
 		return cus_id;
 	}
@@ -28,23 +28,24 @@ public class customer_model {
 	public void setCus_name(String cus_name) {
 		this.cus_name = cus_name;
 	}
-	public String getEmp_email() {
-		return emp_email;
+	public String getCus_email() {
+		return cus_email;
 	}
-	public void setEmp_email(String emp_email) {
-		this.emp_email = emp_email;
+	public void setCus_email(String cus_email) {
+		this.cus_email = cus_email;
 	}
-	public String getEmp_cell() {
-		return emp_cell;
+	public String getCus_cell() {
+		return cus_cell;
 	}
-	public void setEmp_cell(String emp_cell) {
-		this.emp_cell = emp_cell;
+	public void setCus_cell(String cus_cell) {
+		this.cus_cell = cus_cell;
 	}
-	public String getEmp_pass() {
-		return emp_pass;
+	public String getCus_pass() {
+		return cus_pass;
 	}
-	public void setEmp_pass(String emp_pass) {
-		this.emp_pass = emp_pass;
+	public void setCus_pass(String cus_pass) {
+		this.cus_pass = cus_pass;
 	}
+
 
 }

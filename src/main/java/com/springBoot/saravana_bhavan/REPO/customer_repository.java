@@ -122,6 +122,13 @@ public class customer_repository {
 	}
 
 	
+	
+	public List<customer_model>all_cus(){
+		StoredProcedureQuery sp = entityManager.createStoredProcedureQuery("sp_cus_getall",customer_model.class);
+       return sp.getResultList();
+		
+	}
+	
 
 	public List<customer_model> cus_all() {
 		
@@ -135,16 +142,16 @@ public class customer_repository {
 	public  String customer_update(String cus_id,String cus_name,
 			String cus_email,String cus_cell,String cus_pass,
 			String idt) {
-		String enc_pass = AES.Encrypt(cus_pass);
+		       
 		
 		StoredProcedureQuery sp  = entityManager
-				.createStoredProcedureQuery("sp_cus_ins")
+				.createStoredProcedureQuery("sp_cus_upd")
 				.registerStoredProcedureParameter("cus_id",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("cus_name",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("cus_email",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("cus_cell",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("cus_pass",String.class,ParameterMode.IN)
-				.registerStoredProcedureParameter("idt",String.class,ParameterMode.OUT)
+				.registerStoredProcedureParameter("idt",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("res",String.class,ParameterMode.OUT);
 				
 				
@@ -152,8 +159,8 @@ public class customer_repository {
 		sp.setParameter("cus_name", cus_name);
 		sp.setParameter("cus_email", cus_email);
 		sp.setParameter("cus_cell", cus_cell);
-		sp.setParameter("cus_pass", cus_pass);
-		
+		sp.setParameter("cus_pass", cus_pass );
+		sp.setParameter("idt", idt);
 		
 		sp.execute();
 		
@@ -161,6 +168,8 @@ public class customer_repository {
 				
 		return (String)sp.getOutputParameterValue("res");
 	}
+	
+
 	
 	
 

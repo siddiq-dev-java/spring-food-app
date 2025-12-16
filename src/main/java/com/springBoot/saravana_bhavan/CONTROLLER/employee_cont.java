@@ -15,9 +15,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import com.springBoot.saravana_bhavan.DTO.employee_login_dto;
 import com.springBoot.saravana_bhavan.DTO.employee_signup_dto;
+import com.springBoot.saravana_bhavan.MODEL.customer_model;
 import com.springBoot.saravana_bhavan.MODEL.employee_model;
+import com.springBoot.saravana_bhavan.REPO.customer_repository;
 import com.springBoot.saravana_bhavan.REPO.employee_repository;
 import com.springBoot.saravana_bhavan.project_help.AES;
+
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -30,6 +33,9 @@ public class employee_cont {
 
     @Autowired
     private employee_repository employeeRepository;
+
+    @Autowired
+    private customer_repository customerRepository;
     
     @GetMapping("/home")
     public String home(){
@@ -155,7 +161,8 @@ public class employee_cont {
     
     
     @GetMapping("/employee_dash")
-    public String dash(HttpSession session, Model model) {
+    public String dash(HttpSession session,Model model,
+   		 RedirectAttributes redirectAttributes) {
     	String emp_name = (String)session.getAttribute("emp_name");
     	String emp_role= (String)session.getAttribute("emp_role");
     	
@@ -163,8 +170,11 @@ public class employee_cont {
     	model.addAttribute("emp_name", emp_name);
     	
     	if(emp_name == null) {
+    		redirectAttributes.addFlashAttribute("res","pls login in");
     		return "redirect:/employee_login";
     	}
+    	List<customer_model> all_cus =  customerRepository.cus_all();
+    	model.addAttribute("all_cus", all_cus);
       
         return "employee_dash";
     }
