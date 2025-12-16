@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Add Food</title>
+    <title>Food</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -13,46 +13,102 @@
             display:flex;
             align-items:center;
             justify-content:center;
+            font-family: 'Segoe UI', sans-serif;
         }
         .card{
-            width:420px;
+            width:440px;
             border-radius:18px;
+            border:none;
+        }
+        .card-header{
+            background:#0f172a;
+            color:white;
+            border-radius:18px 18px 0 0;
+        }
+        .form-label{
+            font-weight:600;
+            font-size:14px;
+        }
+        .btn-primary{
+            background:#0f172a;
+            border:none;
+        }
+        .btn-primary:hover{
+            background:#1e293b;
         }
     </style>
 </head>
 <body>
 
-<div class="card shadow">
+<div class="card shadow-lg">
+    <div class="card-header text-center py-3">
+        <h5 class="mb-0">🍔 Food Management</h5>
+        <small class="text-light">Add New Food Item</small>
+    </div>
+
     <div class="card-body p-4">
-        <h4 class="text-center mb-4">🍔 Add Food</h4>
 
-        <form method="post" th:action="@{/food}" enctype="multipart/form-data">
+        <!-- SIMPLE & SAFE FORM -->
+        <form method="post"
+              action="/insert"
+              th:object="${dto}"
+              enctype="multipart/form-data">
 
+            <!-- Food ID -->
+            <div class="mb-3">
+                <label class="form-label">Food ID</label>
+                <input type="text" th:field="*{food_id}" class="form-control" placeholder="F001">
+            </div>
+
+            <!-- Admin -->
+            <div class="mb-3">
+                <label class="form-label">Admin</label>
+                <select th:field="*{emp_id}" class="form-select">
+                    <option value="">-- Select Admin --</option>
+                    <option th:each="a : ${admins}"
+                            th:value="${a.emp_id}"
+                            th:text="${a.emp_name}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Food Name -->
             <div class="mb-3">
                 <label class="form-label">Food Name</label>
-                <input type="text" class="form-control" name="food_name" required>
+                <input type="text" th:field="*{food_name}" class="form-control" placeholder="Dosa">
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Price</label>
-                <input type="number" class="form-control" name="food_price" required>
+            <!-- Price & Stock -->
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label class="form-label">Price</label>
+                    <input type="number" th:field="*{food_price}" class="form-control" placeholder="50">
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="form-label">Stock</label>
+                    <input type="number" th:field="*{food_stock}" class="form-control" placeholder="20">
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Stock</label>
-                <input type="number" class="form-control" name="food_stock" required>
-            </div>
-
+            <!-- Image -->
             <div class="mb-3">
                 <label class="form-label">Food Image</label>
-                <input type="file" class="form-control" name="food_image">
+                <input type="file" name="pimagefile" class="form-control">
             </div>
 
-            <div class="d-grid">
-                <button class="btn btn-dark">Add Food</button>
+            <!-- Details -->
+            <div class="mb-4">
+                <label class="form-label">Food Details</label>
+                <input type="text" th:field="*{food_detail}" class="form-control"
+                       placeholder="Crispy & tasty">
             </div>
+
+            <button class="btn btn-primary w-100 py-2">
+                ➕ Add Food
+            </button>
 
         </form>
+
     </div>
 </div>
 

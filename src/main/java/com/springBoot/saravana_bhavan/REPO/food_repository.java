@@ -54,6 +54,18 @@ public class food_repository {
 				
 		return (String)sp.getOutputParameterValue("res");
 	}
+	
+	
+	public String food_del(String food_id) {
+		StoredProcedureQuery sp = entityManager.createNamedStoredProcedureQuery("sp_food_del")
+				.registerStoredProcedureParameter("food_id", String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter("res",String.class, ParameterMode.OUT);
+		
+		sp.setParameter("food_id",food_id);
+		
+		
+		return (String)sp.getOutputParameterValue("res");
+	}
 
 	public List<food_model> food_all() {
 
