@@ -26,6 +26,19 @@ public class food_dto {
     private String food_stock;
 	
 	
+public String getFood_image() {
+		return food_image;
+	}
+
+
+	public void setFood_image(String food_image) {
+		this.food_image = food_image;
+	}
+
+
+private String food_image;
+		
+	
 	@NotBlank(message = "enter detail---")
     private String food_detail;
 	
@@ -90,5 +103,7 @@ public class food_dto {
 	public void setFood_detail(String food_detail) {
 		this.food_detail = food_detail;
 	}
+
+
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.springBoot.saravana_bhavan.DTO.food_dto;
 import com.springBoot.saravana_bhavan.MODEL.food_model;
 
 import jakarta.persistence.EntityManager;
@@ -13,16 +14,16 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.StoredProcedureQuery;
 
 
+
 @Repository
+
 public class food_repository {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
 	
 	
-	public  String food_insert (String food_id,String emp_id,
-			String food_name,String food_price,String food_stock,
-			String food_image,String food_detail, String idt) {
+	public  String food_insert (food_dto dto) {
 		
 		
 		StoredProcedureQuery sp  = entityManager
@@ -37,13 +38,13 @@ public class food_repository {
 				.registerStoredProcedureParameter("idt",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("res",String.class,ParameterMode.OUT);
 				
-	    sp.setParameter("food_id",food_id);	
-	    sp.setParameter("emp_id", emp_id);
-		sp.setParameter("food_name", food_name);
-		sp.setParameter("food_price", food_price);
-		sp.setParameter("food_stock", food_stock);
-		sp.setParameter("food_image", food_image);
-		sp.setParameter("food_detail", food_detail);
+	    sp.setParameter("food_id",dto.getFood_id());	
+	    sp.setParameter("emp_id", dto.getEmp_id());
+		sp.setParameter("food_name",dto.getFood_name());
+		sp.setParameter("food_price",dto.getFood_price());
+		sp.setParameter("food_stock", dto.getFood_stock());
+		sp.setParameter("food_image", dto.getFood_image());
+		sp.setParameter("food_detail", dto.getFood_detail());
 		sp.setParameter("idt", java.time.LocalDateTime.now().
 				format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
 		
