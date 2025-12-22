@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,15 +17,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.springBoot.saravana_bhavan.DTO.customer_signup_dto;
 import com.springBoot.saravana_bhavan.DTO.food_dto;
+import com.springBoot.saravana_bhavan.MODEL.customer_model;
 import com.springBoot.saravana_bhavan.MODEL.employee_model;
 import com.springBoot.saravana_bhavan.MODEL.food_model;
 import com.springBoot.saravana_bhavan.REPO.employee_repository;
 import com.springBoot.saravana_bhavan.REPO.food_repository;
+import com.springBoot.saravana_bhavan.project_help.AES;
 
 
 import org.springframework.beans.factory.annotation.Value;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -106,5 +111,55 @@ public class food_cont {
 	    return "food";
 
 	}
+	
+	@PostMapping("/food_search")
+	public String food_search(Model model,
+	                          @RequestParam("food_id") String food_id) {
+
+	    Map<String, Object> response = foodRepository.food_search(food_id);
+
+	    food_model food = (food_model) response.get("food");
+	    String resultmsg = (String) response.get("res");
+
+	    food_dto dto = new food_dto();
+
+	    if(food != null){
+
+	        dto.setFood_id(food.getFood_id());
+	        dto.setEmp_id(food.getEmp_id());
+	        dto.setFood_name(food.getFood_name());
+	        dto.setFood_price(String.valueOf(food.getFood_price()));
+	        dto.setFood_stock(String.valueOf(food.getFood_stock()));
+	        dto.setFood_image(food.getFood_image());
+	        dto.setFood_detail(food.getFood_detail());
+	    }
+
+	    model.addAttribute("dto", dto);   
+	    model.addAttribute("admins", employeeRepository.emp_admin());
+	    model.addAttribute("food", foodRepository.food_all());
+	    model.addAttribute("res", resultmsg);
+
+	    return "food_update";
+	}
+
+
+	@GetMapping("/food_update")
+	public String foodupdate(Model model) {
+
+	    List<food_model> food = foodRepository.food_all();
+	    List<employee_model> admins = employeeRepository.emp_admin();
+	    
+	    model.addAttribute("food", food);
+	    model.addAttribute("admins", admins);
+
+	   
+	    if(!model.containsAttribute("dto")) {
+	        model.addAttribute("dto", new food_dto());
+	    }
+
+	    return "food_update";
+	}
+
+	
 
 }

@@ -72,27 +72,43 @@
 <div class="card shadow-sm">
     <div class="card-header text-center py-3">
         <h5 class="mb-0">🍔 Food Management</h5>
-        <small class="text-light">Add Food</small>
+        <small class="text-light">UPDATE Food</small>
     </div>
 
     <div class="card-body p-4">
 
-        <!-- ✅ SUCCESS / ERROR MESSAGE -->
+        <!-- Success Message -->
         <div th:if="${res}"
              class="alert alert-success text-center fw-bold mb-3">
             <span th:text="${res}"></span>
         </div>
 
-        <!-- INSERT FORM -->
+
+        <!-- 🔥 SEARCH FORM SEPARATE -->
+        <form method="post" action="/food_search">
+            <div class="mb-3">
+                <label class="fw-bold">FOOD ID</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" name="food_id">
+                    <button class="btn btn-secondary">Search</button>
+                </div>
+            </div>
+        </form>
+
+
+        <!-- 🔥 UPDATE FORM -->
         <form method="post"
               action="/insert"
               th:object="${dto}"
               enctype="multipart/form-data">
+			  
+			  
+			  <div class="mb-3">
+			      <label class="form-label">Food ID</label>
+			      <input type="text" th:field="*{food_id}" class="form-control" readonly>
+			  </div>
 
-            <div class="mb-3">
-                <label class="form-label">Food ID</label>
-                <input type="text" th:field="*{food_id}" class="form-control">
-            </div>
+
 
             <div class="mb-3">
                 <label class="form-label">Admin</label>
@@ -121,31 +137,35 @@
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Food Image</label>
-                <input type="file"
-                       name="pimageFile"
-                       class="form-control"
-                       accept="image/*"
-                       onchange="previewImage(event)">
-                <img id="preview">
-            </div>
+			<div class="mb-3">
+			    <label class="form-label">Food Image</label>
+
+			    <!-- Show Existing Image if available -->
+			    <img th:if="*{food_image != null}"
+			         th:src="@{'/uploads/food/' + *{food_image}}"
+			         style="max-width:200px; border-radius:10px; display:block; margin-bottom:10px;" />
+
+			    <!-- Upload New Image -->
+			    <input type="file"
+			           name="pimageFile"
+			           class="form-control"
+			           accept="image/*"
+			           onchange="previewImage(event)">
+
+			    <img id="preview" style="display:none; max-width:200px; margin-top:10px; border-radius:10px;"/>
+			</div>
+
 
             <div class="mb-4">
                 <label class="form-label">Food Details</label>
                 <input type="text" th:field="*{food_detail}" class="form-control">
             </div>
 
+            <hr>
+
             <button type="submit" class="btn btn-primary w-100 py-2">
-                Insert
+                Update
             </button>
-			
-			<hr>
-			
-			<a href="/food_update"
-			          class="btn btn-primary w-100 py-2">
-			        Food Update
-			      </a>
 
         </form>
 
