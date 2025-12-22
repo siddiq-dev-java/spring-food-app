@@ -1,6 +1,7 @@
 package com.springBoot.saravana_bhavan.CONTROLLER;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -71,25 +72,27 @@ public class food_cont {
 	        model.addAttribute("admins", employeeRepository.emp_admin());
 	        return "food";
 	    }
-
 	    try {
-	        if (!file.isEmpty()) {
+	        
+	    	if(file != null && !file.isEmpty()) {
 
-	            String img_name = file.getOriginalFilename();
-	            dto.setFood_image(img_name);
-	            File simg = new File(img_path);
-	            if (!simg.exists()) {
-	                boolean created = simg.mkdirs();
-	                System.out.println("IMAGE simg CREATED = " + created);
-	            }
-	            System.out.println("IMAGE NAME = " + img_name);
-	            System.out.println("IMAGE PATH = " + img_path);
+	    	    String img_name = file.getOriginalFilename();
+	    	    dto.setFood_image(img_name);
 
+	    	    File folder = new File(img_path);
+	    	    if(!folder.exists()){
+	    	        folder.mkdirs();
+	    	    }
 
-	            Path path = Paths.get(img_path , img_name);
-	            file.transferTo(path.toFile());
+	    	    Path path = Paths.get(img_path + File.separator + img_name);
+	    	    Files.copy(file.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
-	        }
+	    	    System.out.println("IMAGE STORED SUCCESSFULLY AT : " + path);
+	    	}
+	    	else{
+	    	    System.out.println("NO FILE SELECTED!");
+	    	}
+
 
 	    } catch (Exception e) {
 	    	
@@ -111,7 +114,6 @@ public class food_cont {
 	    return "food";
 
 	}
-	
 	@PostMapping("/food_search")
 	public String food_search(Model model,
 	                          @RequestParam("food_id") String food_id) {
@@ -134,13 +136,13 @@ public class food_cont {
 	        dto.setFood_detail(food.getFood_detail());
 	    }
 
-	    model.addAttribute("dto", dto);   
+	    model.addAttribute("dto", dto);
 	    model.addAttribute("admins", employeeRepository.emp_admin());
-	    model.addAttribute("food", foodRepository.food_all());
 	    model.addAttribute("res", resultmsg);
 
 	    return "food_update";
 	}
+
 
 
 	@GetMapping("/food_update")
@@ -158,7 +160,60 @@ public class food_cont {
 	    }
 
 	    return "food_update";
+
+
 	}
+	
+	@PostMapping("/food_update")
+	public String food_update(
+	        @ModelAttribute("dto") food_dto dto,
+	        @RequestParam(value = "pimageFile", required = false) MultipartFile file,
+	        Model model) {
+
+	    try {
+
+	        // 🔥 if new image uploaded → save new image
+	        if(file != null && !file.isEmpty()) {
+
+	            String img_name = file.getOriginalFilename();
+	            dto.setFood_image(img_name);
+
+	            File folder = new File(img_path);
+	            if(!folder.exists())
+	                folder.mkdirs();
+
+	            Path path = Paths.get(img_path + File.separator + img_name);
+	            Files.copy(file.getInputStream(), path,
+	                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+	            System.out.println("UPDATED IMAGE SAVED = " + path);
+	        }
+	        else{
+	            // 🔥 NO new image → keep old image
+	            food_model oldFood = foodRepository.food_search(dto.getFood_id())
+	                                               .get("food") != null ?
+	                    (food_model) foodRepository.food_search(dto.getFood_id())
+	                                               .get("food") : null;
+
+	            if(oldFood != null)
+	                dto.setFood_image(oldFood.getFood_image());
+	        }
+
+	    } catch (Exception e){
+	        e.printStackTrace();
+	        model.addAttribute("res","Image Error");
+	    }
+
+	    // 🔥 CALL UPDATE SP
+	    String res = foodRepository.food_update(dto);
+	    model.addAttribute("res", res);
+
+	    model.addAttribute("admins", employeeRepository.emp_admin());
+	    model.addAttribute("dto", dto);
+
+	    return "food_update";
+	}
+
 
 	
 

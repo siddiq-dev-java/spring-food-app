@@ -129,7 +129,7 @@ public class food_repository {
 		
 		
 		StoredProcedureQuery sp  = entityManager
-				.createStoredProcedureQuery("sp_food_ins")
+				.createStoredProcedureQuery("sp_food_upd")
 				.registerStoredProcedureParameter("food_id",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("emp_id",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("food_name",String.class,ParameterMode.IN)

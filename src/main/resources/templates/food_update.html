@@ -68,109 +68,90 @@
 </head>
 
 <body>
-
-<div class="card shadow-sm">
-    <div class="card-header text-center py-3">
-        <h5 class="mb-0">🍔 Food Management</h5>
-        <small class="text-light">UPDATE Food</small>
-    </div>
-
-    <div class="card-body p-4">
-
-        <!-- Success Message -->
-        <div th:if="${res}"
-             class="alert alert-success text-center fw-bold mb-3">
-            <span th:text="${res}"></span>
-        </div>
-
-
-        <!-- 🔥 SEARCH FORM SEPARATE -->
-        <form method="post" action="/food_search">
-            <div class="mb-3">
-                <label class="fw-bold">FOOD ID</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" name="food_id">
-                    <button class="btn btn-secondary">Search</button>
-                </div>
-            </div>
-        </form>
-
-
-        <!-- 🔥 UPDATE FORM -->
-        <form method="post"
-              action="/insert"
-              th:object="${dto}"
-              enctype="multipart/form-data">
-			  
-			  
-			  <div class="mb-3">
-			      <label class="form-label">Food ID</label>
-			      <input type="text" th:field="*{food_id}" class="form-control" readonly>
+	<div class="card shadow-sm">
+		 <div class="card-header text-center py-3"> 
+			<h5 class="mb-0">🍔 Food Management</h5>
+			 <small class="text-light">UPDATE Food</small>
+		  </div> <div class="card-body p-4"> <!-- Success Message --> 
+			<div th:if="${res}" class="alert alert-success text-center fw-bold mb-3">
+				 <span th:text="${res}"></span>
 			  </div>
+			  
+	<form method="post"
+	      th:object="${dto}"
+	      action="/food_update"
+	      enctype="multipart/form-data">
 
+	    <div class="mb-3">
+	        <label class="fw-bold">FOOD ID</label>
+	        <div class="input-group">
+	            <input type="text" class="form-control"
+	                   th:field="*{food_id}">
+	            <button class="btn btn-secondary btn-custom"
+	                    formaction="/food_search"
+	                    formmethod="post">
+	                Search
+	            </button>
+	        </div>
+	    </div>
 
+	    <div class="mb-3">
+	        <label class="form-label">Admin</label>
+	        <select th:field="*{emp_id}" class="form-select">
+	            <option value="">-- Select Admin --</option>
+	            <option th:each="a : ${admins}"
+	                    th:value="${a.emp_id}"
+	                    th:text="${a.emp_name}">
+	            </option>
+	        </select>
+	    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Admin</label>
-                <select th:field="*{emp_id}" class="form-select">
-                    <option value="">-- Select Admin --</option>
-                    <option th:each="a : ${admins}"
-                            th:value="${a.emp_id}"
-                            th:text="${a.emp_name}">
-                    </option>
-                </select>
-            </div>
+	    <div class="mb-3">
+	        <label class="form-label">Food Name</label>
+	        <input type="text" th:field="*{food_name}" class="form-control">
+	    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Food Name</label>
-                <input type="text" th:field="*{food_name}" class="form-control">
-            </div>
+	    <div class="row">
+	        <div class="col-6 mb-3">
+	            <label class="form-label">Price</label>
+	            <input type="number" th:field="*{food_price}" class="form-control">
+	        </div>
+	        <div class="col-6 mb-3">
+	            <label class="form-label">Stock</label>
+	            <input type="number" th:field="*{food_stock}" class="form-control">
+	        </div>
+	    </div>
 
-            <div class="row">
-                <div class="col-6 mb-3">
-                    <label class="form-label">Price</label>
-                    <input type="number" th:field="*{food_price}" class="form-control">
-                </div>
-                <div class="col-6 mb-3">
-                    <label class="form-label">Stock</label>
-                    <input type="number" th:field="*{food_stock}" class="form-control">
-                </div>
-            </div>
+	    <div class="mb-3">
+	        <label class="form-label">Food Image</label>
 
-			<div class="mb-3">
-			    <label class="form-label">Food Image</label>
+	        <img th:if="${dto.food_image != null}"
+	             th:src="@{'/uploads/food/' + ${dto.food_image}}"
+	             style="max-width:200px;border-radius:10px;margin-bottom:10px;">
 
-			    <!-- Show Existing Image if available -->
-			    <img th:if="*{food_image != null}"
-			         th:src="@{'/uploads/food/' + *{food_image}}"
-			         style="max-width:200px; border-radius:10px; display:block; margin-bottom:10px;" />
+	        <input type="file"
+	               name="pimageFile"
+	               class="form-control"
+	               accept="image/*"
+	               onchange="previewImage(event)">
 
-			    <!-- Upload New Image -->
-			    <input type="file"
-			           name="pimageFile"
-			           class="form-control"
-			           accept="image/*"
-			           onchange="previewImage(event)">
+	        <img id="preview"
+	             style="display:none; max-width:200px; margin-top:10px; border-radius:10px;"/>
+	    </div>
 
-			    <img id="preview" style="display:none; max-width:200px; margin-top:10px; border-radius:10px;"/>
-			</div>
+	    <div class="mb-4">
+	        <label class="form-label">Food Details</label>
+	        <input type="text" th:field="*{food_detail}" class="form-control">
+	    </div>
 
+	    <hr>
 
-            <div class="mb-4">
-                <label class="form-label">Food Details</label>
-                <input type="text" th:field="*{food_detail}" class="form-control">
-            </div>
+	    <button type="submit" class="btn btn-primary w-100">
+	        Update
+	    </button>
 
-            <hr>
+	</form>
 
-            <button type="submit" class="btn btn-primary w-100 py-2">
-                Update
-            </button>
-
-        </form>
-
-    </div>
-</div>
 
 <script>
 function previewImage(event){
