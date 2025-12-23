@@ -1,163 +1,178 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Food</title>
+<meta charset="UTF-8">
+<title>Food Update</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        *{
-            box-sizing:border-box;
-            margin:0;
-            padding:0;
-        }
+<style>
 
-        body{
-            background: linear-gradient(135deg,#0f172a,#1e293b);
-            min-height:100vh;
-            font-family:'Segoe UI', sans-serif;
-        }
+body{
+    background:#0f172a;
+    min-height:100vh;
+    font-family:'Segoe UI';
+}
 
-        .card{
-            width:650px;
-            max-width:95%;
-            margin:40px auto;
-            border-radius:18px;
-            border:none;
-            background:#f8fafc;
-        }
+.navbar-custom{
+    background: linear-gradient(90deg,#0891b2,#06b6d4);
+    box-shadow:0 4px 14px rgba(0,0,0,.35);
+}
 
-        .card-header{
-            background:#1e293b;
-            color:#f8fafc;
-            border-radius:18px 18px 0 0;
-        }
+.wrapper{
+    width: 850px;
+    max-width:95%;
+    background:#ffffff;
+    border-radius:18px;
+    padding:25px 35px;
+    margin:25px auto;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
 
-        .form-label{
-            font-weight:600;
-            font-size:14px;
-            color:#334155;
-        }
+.section-title{
+    font-size:13px;
+    font-weight:700;
+    color:#475569;
+    margin-bottom:6px;
+}
 
-        .form-control,
-        .form-select{
-            border-radius:10px;
-            font-size:14px;
-            background:#ffffff;
-        }
+.form-control,.form-select{
+    border-radius:10px;
+    font-size:14px;
+}
 
-        .btn-primary{
-            background:#64748b;
-            border:none;
-            border-radius:12px;
-            font-weight:600;
-        }
+.btn-primary{
+    border-radius:12px;
+    font-weight:600;
+    background:#334155;
+    border:none;
+}
 
-        .btn-primary:hover{
-            background:#475569;
-        }
+.btn-primary:hover{
+    background:#1e293b;
+}
 
-        #preview{
-            max-width:200px;
-            margin-top:10px;
-            border-radius:10px;
-            display:none;
-        }
-    </style>
+.btn-danger{
+    border-radius:12px;
+}
+
+img{
+    border-radius:10px;
+}
+
+</style>
 </head>
 
 <body>
-	<div class="card shadow-sm">
-		 <div class="card-header text-center py-3"> 
-			<h5 class="mb-0">🍔 Food Management</h5>
-			 <small class="text-light">UPDATE Food</small>
-		  </div> <div class="card-body p-4"> <!-- Success Message --> 
-			<div th:if="${res}" class="alert alert-success text-center fw-bold mb-3">
-				 <span th:text="${res}"></span>
-			  </div>
-			  
-	<form method="post"
-	      th:object="${dto}"
-	      action="/food_update"
-	      enctype="multipart/form-data">
 
-	    <div class="mb-3">
-	        <label class="fw-bold">FOOD ID</label>
-	        <div class="input-group">
-	            <input type="text" class="form-control"
-	                   th:field="*{food_id}">
-	            <button class="btn btn-secondary btn-custom"
-	                    formaction="/food_search"
-	                    formmethod="post">
-	                Search
-	            </button>
-	        </div>
-	    </div>
+<nav class="navbar-custom d-flex justify-content-between align-items-center px-5 py-3">
+    <h4 class="text-white fw-bold m-0">🍔 UPDATE FOOD</h4>
 
-	    <div class="mb-3">
-	        <label class="form-label">Admin</label>
-	        <select th:field="*{emp_id}" class="form-select">
-	            <option value="">-- Select Admin --</option>
-	            <option th:each="a : ${admins}"
-	                    th:value="${a.emp_id}"
-	                    th:text="${a.emp_name}">
-	            </option>
-	        </select>
-	    </div>
+    <a href="/food" class="btn btn-dark fw-bold">
+        Back
+    </a>
+</nav>
 
-	    <div class="mb-3">
-	        <label class="form-label">Food Name</label>
-	        <input type="text" th:field="*{food_name}" class="form-control">
-	    </div>
 
-	    <div class="row">
-	        <div class="col-6 mb-3">
-	            <label class="form-label">Price</label>
-	            <input type="number" th:field="*{food_price}" class="form-control">
-	        </div>
-	        <div class="col-6 mb-3">
-	            <label class="form-label">Stock</label>
-	            <input type="number" th:field="*{food_stock}" class="form-control">
-	        </div>
-	    </div>
+<div class="wrapper">
 
-	    <div class="mb-3">
-	        <label class="form-label">Food Image</label>
+    <div th:if="${res}" class="alert alert-success text-center fw-bold">
+        <span th:text="${res}"></span>
+    </div>
 
-	        <img th:if="${dto.food_image != null}"
-	             th:src="@{'/uploads/food/' + ${dto.food_image}}"
-	             style="max-width:200px;border-radius:10px;margin-bottom:10px;">
+    <form method="post" th:object="${dto}" action="/food_update" enctype="multipart/form-data">
 
-	        <input type="file"
-	               name="pimageFile"
-	               class="form-control"
-	               accept="image/*"
-	               onchange="previewImage(event)">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="section-title">FOOD ID</label>
+                <div class="input-group">
+                    <input type="text" th:field="*{food_id}" class="form-control">
+                    <button class="btn btn-secondary"
+                            formaction="/food_search"
+                            formmethod="post">
+                        Search
+                    </button>
+                </div>
+            </div>
 
-	        <img id="preview"
-	             style="display:none; max-width:200px; margin-top:10px; border-radius:10px;"/>
-	    </div>
+            <div class="col-md-6">
+                <label class="section-title">ADMIN</label>
+                <select th:field="*{emp_id}" class="form-select">
+                    <option value="">-- Select Admin --</option>
+                    <option th:each="a : ${admins}"
+                            th:value="${a.emp_id}"
+                            th:text="${a.emp_name}">
+                    </option>
+                </select>
+            </div>
+        </div>
 
-	    <div class="mb-4">
-	        <label class="form-label">Food Details</label>
-	        <input type="text" th:field="*{food_detail}" class="form-control">
-	    </div>
 
-	    <hr>
+        <div class="row mb-3">
 
-	    <button type="submit" class="btn btn-primary w-100">
-	        Update
-	    </button>
+            <div class="col-md-6">
+                <label class="section-title">FOOD NAME</label>
+                <input type="text" th:field="*{food_name}" class="form-control">
+            </div>
 
-	</form>
+            <div class="col-md-3">
+                <label class="section-title">PRICE</label>
+                <input type="number" th:field="*{food_price}" class="form-control">
+            </div>
 
+            <div class="col-md-3">
+                <label class="section-title">STOCK</label>
+                <input type="number" th:field="*{food_stock}" class="form-control">
+            </div>
+
+        </div>
+
+
+        <div class="row mb-3">
+
+            <div class="col-md-6">
+                <label class="section-title">CURRENT IMAGE</label>
+                <img th:if="${dto.food_image != null}"
+                     th:src="@{'/uploads/food/' + ${dto.food_image}}"
+                     style="max-width:230px;">
+            </div>
+
+            <div class="col-md-6">
+                <label class="section-title">CHANGE IMAGE</label>
+                <input type="file" name="pimageFile" class="form-control"
+                       accept="image/*" onchange="previewImage(event)">
+                <img id="preview"
+                     style="display:none;max-width:230px;margin-top:10px;">
+            </div>
+
+        </div>
+
+
+        <div class="mb-3">
+            <label class="section-title">FOOD DETAILS</label>
+            <input type="text" th:field="*{food_detail}" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+            Update Food
+        </button>
+
+        <button type="submit"
+                formaction="/food_delete"
+                formmethod="post"
+                class="btn btn-danger w-100 mt-2">
+            Delete
+        </button>
+
+    </form>
+
+</div>
 
 <script>
 function previewImage(event){
-    const img = document.getElementById("preview");
-    img.src = URL.createObjectURL(event.target.files[0]);
-    img.style.display = "block";
+    const img=document.getElementById("preview");
+    img.src=URL.createObjectURL(event.target.files[0]);
+    img.style.display="block";
 }
 </script>
 

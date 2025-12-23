@@ -214,6 +214,19 @@ public class food_cont {
 	    return "food_update";
 	}
 
+	@PostMapping("/food_delete")
+	public String food_delete(@RequestParam("food_id") String food_id,
+	                          Model model){
+
+	    String res = foodRepository.food_del(food_id);
+
+	    model.addAttribute("res", res);
+	    model.addAttribute("food", foodRepository.food_all());
+	    model.addAttribute("admins", employeeRepository.emp_admin());
+	    model.addAttribute("dto", new food_dto());
+
+	    return "food_update";
+	}
 
 	
 
