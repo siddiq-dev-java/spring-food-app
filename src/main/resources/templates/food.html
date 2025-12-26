@@ -9,7 +9,7 @@
 <style>
 
 body{
-    background: linear-gradient(135deg,#0f172a,#1e293b);
+    background: linear-gradient(135deg,#020617,#0f172a,#1e293b);
     min-height:100vh;
     font-family:'Segoe UI';
 }
@@ -22,7 +22,7 @@ body{
 
 /* CARD */
 .container-box{
-    width:650px;
+    width:700px;
     max-width:95%;
     margin:40px auto;
 }
@@ -31,39 +31,92 @@ body{
     border-radius:18px;
     border:none;
     background:#f8fafc;
-    box-shadow:0 20px 60px rgba(0,0,0,.45);
+    box-shadow:0 20px 55px rgba(0,0,0,.45);
+}
+
+/* LABELS */
+.form-label{
+    font-weight:700;
+    font-size:13px;
+    color:#1f2937;
+    letter-spacing:.5px;
 }
 
 /* INPUTS */
-.form-label{
-    font-weight:600;
-    font-size:14px;
-    color:#334155;
-}
-
 .form-control,
 .form-select{
-    border-radius:10px;
+    border-radius:12px;
     font-size:14px;
 }
 
 /* BUTTONS */
 .btn-primary{
-    background:#334155;
+    background:linear-gradient(135deg,#1e293b,#334155);
     border:none;
     border-radius:12px;
-    font-weight:600;
+    font-weight:700;
 }
 .btn-primary:hover{
-    background:#1e293b;
+    background:linear-gradient(135deg,#020617,#0f172a);
 }
 
 /* IMAGE PREVIEW */
 #preview{
-    max-width:220px;
+    max-width:240px;
     margin-top:10px;
-    border-radius:10px;
+    border-radius:12px;
     display:none;
+}
+
+/* *****************************
+   FOOD LIST SECTION
+******************************/
+.card-box{
+    width:90%;
+    margin:40px auto;
+    background:white;
+    padding:25px;
+    border-radius:25px;
+    box-shadow:0 25px 70px rgba(0,0,0,.45);
+}
+
+.section-title{
+    font-weight:900;
+    color:#0f172a;
+}
+
+.badge-tag{
+    background:#14b8a6;
+    color:white;
+    padding:6px 10px;
+    border-radius:8px;
+    margin-left:10px;
+}
+
+thead{
+    background:#0f172a;
+    color:white;
+}
+
+tr:hover{
+    background:#eef9ff !important;
+}
+
+.food-img{
+    width:90px;
+    height:90px;
+    border-radius:10px;
+    object-fit:cover;
+}
+
+.btn-accent{
+    background:#14b8a6;
+    color:#073a35;
+    border:none;
+    font-weight:700;
+}
+.btn-accent:hover{
+    background:#22d3b9;
 }
 
 </style>
@@ -90,7 +143,6 @@ body{
     <div th:if="${res}" class="alert alert-success text-center fw-bold mb-3">
         <span th:text="${res}"></span>
     </div>
-
 
     <!-- FORM -->
     <form method="post" action="/insert" th:object="${dto}" enctype="multipart/form-data">
@@ -121,6 +173,7 @@ body{
                 <label class="form-label">Price</label>
                 <input type="number" th:field="*{food_price}" class="form-control">
             </div>
+
             <div class="col-6 mb-3">
                 <label class="form-label">Stock</label>
                 <input type="number" th:field="*{food_stock}" class="form-control">
@@ -156,6 +209,52 @@ body{
 
 </div>
 </div>
+</div>
+
+
+
+<!-- FOOD LIST -->
+<div class="card-box">
+
+<h4 class="section-title">
+    Food List <span class="badge-tag">Available</span>
+</h4>
+
+<div class="table-responsive mt-3">
+<table class="table table-bordered text-center align-middle">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Price</th>
+<th>Stock</th>
+<th>Image</th>
+</tr>
+</thead>
+
+<tbody>
+<tr th:each="f : ${food_all1}">
+<td th:text="${f.food_id}"></td>
+<td th:text="${f.food_name}"></td>
+<td>₹ <span th:text="${f.food_price}"></span></td>
+<td th:text="${f.food_stock}"></td>
+
+<td>
+<img th:if ="${f.food_image != null}"
+     th:src="@{'/uploads/food/' + ${f.food_image}}"
+     class="food-img">
+<span th:if ="${f.food_image == null}" style="color:gray">
+No Image
+</span>
+</td>
+
+</tr>
+</tbody>
+
+</table>
+</div>
+
 </div>
 
 

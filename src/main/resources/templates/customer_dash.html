@@ -1,87 +1,73 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Customer Dashboard | Saravana Bhavan</title>
+    <meta charset="UTF-8">
+    <title>Customer Dashboard | Saravana Bhavan</title>
 
-<!-- Bootstrap -->
-<link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
-<!-- Icons -->
-<link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-<style>
+    <style>
+        body{
+            min-height:100vh;
+            background:linear-gradient(145deg,#020617,#0f172a,#1e293b);
+        }
 
-body{
-    min-height:100vh;
-    background:radial-gradient(circle at top,#0ea5e9,#020617 60%);
-    display:flex;
-    flex-direction:column;
-}
+        .navbar-custom{
+            background:linear-gradient(90deg,#0891b2,#06b6d4);
+            box-shadow:0 5px 18px rgba(0,0,0,.45);
+        }
 
-/* NAVBAR */
-.navbar-custom{
-    background:linear-gradient(90deg,#0f172a,#020617);
-    box-shadow:0 10px 40px rgba(0,0,0,.8);
-    border-bottom:1px solid rgba(255,255,255,.08);
-}
+        .dash-card{
+            width:430px;
+            border-radius:25px;
+            padding:45px 38px;
+            background:rgba(255,255,255,.96);
+            backdrop-filter:blur(8px);
+            animation:fadeIn .7s ease;
+        }
 
-/* CARD */
-.dash-card{
-    width:450px;
-    border-radius:26px;
-    padding:45px 40px;
-    background:rgba(255,255,255,0.07);
-    backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,.15);
-    box-shadow:0 30px 80px rgba(0,0,0,.9);
-    animation:fadeIn .9s ease;
-}
+        .btn-dash{
+            border-radius:14px;
+            font-size:18px;
+            font-weight:700;
+            letter-spacing:.5px;
+            transition:.3s;
+        }
 
-/* SUB TEXT */
-.sub{
-    font-size:14px;
-    margin-bottom:25px;
-    color:#cbd5e1;
-    font-weight:600;
-}
+        .btn-dash:hover{
+            transform:translateY(-3px);
+            box-shadow:0 8px 20px rgba(0,0,0,.3);
+        }
 
-/* BUTTONS */
-.btn-dash{
-    border-radius:16px;
-    font-size:18px;
-    font-weight:700;
-    letter-spacing:.4px;
-    transition:.3s;
-    border:none;
-}
+        footer{
+            height:50px;
+            background:#020617;
+            color:#fff;
+            font-weight:700;
+            text-align:center;
+            line-height:50px;
+            letter-spacing:1px;
+            margin-top:20px;
+        }
 
-.btn-dash:hover{
-    transform:translateY(-5px) scale(1.02);
-    box-shadow:0 15px 35px rgba(0,0,0,.5);
-}
+        .sub{
+            font-size:14px;
+            margin-bottom:25px;
+            color:#64748b;
+            font-weight:600;
+        }
 
-/* FOOTER */
-footer{
-    height:55px;
-    background:#020617;
-    color:#9ca3af;
-    text-align:center;
-    font-weight:700;
-    line-height:55px;
-    letter-spacing:1px;
-    border-top:1px solid rgba(255,255,255,.1);
-}
-
-/* Animation */
-@keyframes fadeIn{
-from{opacity:0;transform:translateY(30px);}
-to{opacity:1;transform:translateY(0);}
-}
-
-</style>
+        @keyframes fadeIn{
+            from{opacity:0;transform:translateY(30px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+    </style>
 </head>
 
 <body>
@@ -90,58 +76,70 @@ to{opacity:1;transform:translateY(0);}
 <nav class="navbar-custom d-flex justify-content-between align-items-center px-5 py-3">
     <h3 class="text-white fw-bold m-0">CUSTOMER DASHBOARD</h3>
 
-    <a href="/emp_logout" class="btn btn-outline-light fw-bold"
+    <a href="/emp_logout"
+       class="btn btn-outline-light fw-bold"
        onclick="return confirm('Are you sure you want to logout?')">
         <i class="bi bi-box-arrow-right"></i> Logout
     </a>
 </nav>
 
-<!-- SUCCESS MESSAGE -->
+<!-- SUCCESS MSG -->
 <div class="container mt-3">
-    <div th:if="${msg}" class="alert alert-success text-center fw-bold shadow-lg">
+    <div th:if="${msg}" class="alert alert-success text-center fw-bold">
         <span th:text="${msg}"></span>
     </div>
 </div>
 
 <!-- MAIN -->
-<div class="container d-flex justify-content-center align-items-center"
-     style="min-height:80vh;">
+<div class="container d-flex justify-content-center align-items-center" style="min-height:80vh;">
+    <div class="dash-card shadow-lg text-center">
 
-    <div class="dash-card text-center">
-
-        <h4 class="fw-bold text-light">
-            Welcome, <span class="text-info" th:text="${cus_name}">Customer</span>
+        <h4 class="fw-bold text-primary">
+            Welcome,
+            <span class="text-success" th:text="${cus_name}">Customer</span>
         </h4>
 
-        <p class="sub">Choose what you want to do</p>
+        <p class="sub">Choose your action</p>
 
-        <!-- RESET -->
-        <a href="/customer_reset"
-           class="btn btn-lg w-100 mb-3 btn-dash"
-           style="background: linear-gradient(130deg,#f97316,#fb923c); color:white;">
-           <i class="bi bi-arrow-counterclockwise me-2"></i> Customer Reset
-        </a>
+		<!-- CUSTOMER RESET -->
+		<a href="/customer_reset"
+		   class="btn btn-lg w-100 mb-3 btn-dash"
+		   style="background: linear-gradient(135deg,#f97316,#fb923c); color:white; border:none;">
+		   <i class="bi bi-arrow-counterclockwise me-2"></i> Customer Reset
+		</a>
 
-        <!-- BILL -->
-        <a href="/bill"
-           class="btn btn-lg w-100 mb-3 btn-dash"
-           style="background: linear-gradient(130deg,#818cf8,#6366f1); color:white;">
-           <i class="bi bi-receipt me-2"></i> Bill
-        </a>
+		<!-- BILL -->
+		<a href="/bill"
+		   class="btn btn-lg w-100 mb-3 btn-dash"
+		   style="background: linear-gradient(135deg,#6366f1,#4f46e5); color:white; border:none;">
+		   <i class="bi bi-receipt me-2"></i> Bill
+		</a>
 
-        <!-- PDF -->
-        <a href="/bill_pdf"
-           class="btn btn-lg w-100 btn-dash"
-           style="background: linear-gradient(130deg,#ef4444,#b91c1c); color:white;">
-           <i class="bi bi-file-earmark-pdf-fill me-2"></i> Download Bill PDF
-        </a>
+		<!-- PDF -->
+		<!-- SHOW PDF BUTTON ONLY IF BILL AVAILABLE -->
+		<div th:if="${session.lastBillNo != null}">
+		    <a th:href="@{'/bill_pdf?billNo=' + ${session.lastBillNo}}"
+		       class="btn btn-lg w-100 btn-dash"
+		       style="background: linear-gradient(135deg,#dc2626,#b91c1c); color:white; border:none;">
+		       <i class="bi bi-file-earmark-pdf-fill me-2"></i> Download Last Bill PDF
+		    </a>
+		</div>
+
+		<!-- SHOW DISABLED BUTTON IF NO BILL -->
+		<div th:if="${session.lastBillNo == null}">
+		    <button class="btn btn-lg w-100 btn-dash"
+		            style="background: gray; border:none;" disabled>
+		        <i class="bi bi-file-earmark-pdf-fill me-2"></i>
+		        No Bill Available
+		    </button>
+		</div>
 
     </div>
 </div>
 
 <!-- FOOTER -->
 <footer>
-    © 2025 Saravana FOOD | Cool & Sleek Experience 😎
+    © 2025 Saravana FOOD | Designed with ❤️
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

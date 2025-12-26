@@ -49,14 +49,18 @@ public class food_cont {
 
 	@GetMapping("/food")
 	public String food(Model model) {
-		List<food_model> food = foodRepository.food_all();
-		List<employee_model> admins = employeeRepository.emp_admin();
-		
-		model.addAttribute("food",food);
-		model.addAttribute("admins", admins);
-		model.addAttribute("dto", new food_dto() );
-		return "food";
+
+	    List<food_model> food = foodRepository.food_all();
+	    List<employee_model> admins = employeeRepository.emp_admin();
+
+	    model.addAttribute("food",food);
+	    model.addAttribute("food_all1", food);   
+	    model.addAttribute("admins", admins);
+	    model.addAttribute("dto", new food_dto());
+
+	    return "food";
 	}
+
 	
 	@PostMapping("/insert")
 	public String food_insert(
@@ -109,6 +113,7 @@ public class food_cont {
 	    model.addAttribute("res", res);
 	    model.addAttribute("food", foodRepository.food_all());
 	    model.addAttribute("admins", employeeRepository.emp_admin());
+	    model.addAttribute("food_all1", foodRepository.food_all());
 	    model.addAttribute("dto", new food_dto());
 
 	    return "food";

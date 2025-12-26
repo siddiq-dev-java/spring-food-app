@@ -3,10 +3,13 @@ package com.springBoot.saravana_bhavan.CONTROLLER;
 import java.net.http.HttpClient;
 import java.sql.CallableStatement;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.io.OutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.QTypeContributor;
@@ -19,13 +22,23 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.Element;
 
 import com.springBoot.saravana_bhavan.DTO.customer_signup_dto;
 import com.springBoot.saravana_bhavan.MODEL.cart_model;
 import com.springBoot.saravana_bhavan.REPO.food_repository;
 
-
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -94,7 +107,7 @@ public class bill_cont {
 	        @RequestParam(required = false) String food_price,
 	        @RequestParam(required = false) String food_total,
 	        HttpSession session,
-	        RedirectAttributes ra
+	        RedirectAttributes ra,Model model
 	) {
 
 	    // ===== GET CUSTOMER FROM SESSION =====
@@ -147,11 +160,35 @@ public class bill_cont {
 
 	    cart.add(c);
 	    session.setAttribute("cart", cart);
+	 
 
 	    ra.addFlashAttribute("res","✔ Added to Cart");
 
-	    return "redirect:/bill";
+	    return "redirect:/cart";
+
 	}
+	
+	@GetMapping("/cart")
+	public String cartPage(HttpSession session , Model model){
+
+	    List<cart_model> cart = (List<cart_model>) session.getAttribute("cart");
+
+	    if(cart == null){
+	        cart = new ArrayList<>();
+	    }
+
+	    model.addAttribute("cart", cart);
+
+	    double grandTotal = 0;
+	    for(cart_model c: cart){
+	        grandTotal += c.getFood_total();
+	    }
+
+	    model.addAttribute("grand_total", grandTotal);
+
+	    return "cart";
+	}
+
 
 	
 	@GetMapping("/cart_delete")
@@ -230,9 +267,13 @@ public class bill_cont {
 	    }
 
 	    session.removeAttribute("cart");
+	    session.removeAttribute("customer");
 
-	    ra.addFlashAttribute("res","✅ Bill Generated Successfully | Bill No : " + billNo);
+	    session.setAttribute("lastBillNo", billNo);
+
+	    ra.addFlashAttribute("res","Bill Generated Successfully | Bill No : " + billNo);
 	    return "redirect:/view_bill?billNo=" + billNo;
+
 
 	}
 	
@@ -253,25 +294,131 @@ public class bill_cont {
 	    return "view_bill";
 	}
 
-
 	
-	//bill insert
+	@GetMapping("/bill_pdf")
+	public void billPdf(@RequestParam int billNo,
+	                    HttpServletResponse response){
 
-//	String res = jdbcTemplate.execute(ConnectionCallback<String>) con ->{
-//		CallableStatement cs = con.prepareCall("{call sp_ebill_ins(?,?,?,?,?,?,?)}");
-//		cs.setString(1, cus_id);
-//		cs.setString(2, food_id);
-//		cs.setString(3, food_qty);
-//		cs.setString(4, food_total);
-//		cs.setString(5, date);
-//		cs.setString(6, time);
-//		cs.registerOutParameter(7, Types.VARCHAR);
-//		cs.execute();
-//		return cs.getString(7);
-//	});
-//	//stock update
-	//grand total
-	// food carty table
+	    try {
+	        response.setContentType("application/pdf");
+	        response.setHeader("Content-Disposition",
+	                "inline; filename=bill_"+billNo+".pdf");
+
+	        OutputStream out = response.getOutputStream();
+
+	        Document doc = new Document(PageSize.A4);
+	        PdfWriter.getInstance(doc, out);
+	        doc.open();
+
+	        // ====== FONTS ======
+	        Font titleFont = new Font(Font.FontFamily.HELVETICA, 22, Font.BOLD, BaseColor.DARK_GRAY);
+	        Font subFont   = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL, BaseColor.BLACK);
+	        Font headFont  = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.WHITE);
+	        Font normalFont = new Font(Font.FontFamily.HELVETICA, 12);
+
+	        // ====== HEADER ======
+	        Paragraph title = new Paragraph("SARAVANA BHAVAN", titleFont);
+	        title.setAlignment(Element.ALIGN_CENTER);
+	        doc.add(title);
+
+	        Paragraph billTitle = new Paragraph("CUSTOMER BILL", new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD));
+	        billTitle.setAlignment(Element.ALIGN_CENTER);
+	        doc.add(billTitle);
+
+	        doc.add(new Paragraph("\n"));
+
+	        // ====== BILL INFO ======
+	        doc.add(new Paragraph("Bill No : " + billNo, subFont));
+	        doc.add(new Paragraph("Date     : " + LocalDate.now(), subFont));
+	        doc.add(new Paragraph("-------------------------------------------------------------"));
+
+	        doc.add(new Paragraph("\n"));
+
+	        // ====== TABLE ======
+	        PdfPTable table = new PdfPTable(4);
+	        table.setWidthPercentage(100);
+	        table.setSpacingBefore(10f);
+	        table.setSpacingAfter(10f);
+	        table.setWidths(new float[]{3, 2, 2, 2});
+
+	        BaseColor headerColor = new BaseColor(34, 197, 94); // green stylish
+
+	        PdfPCell h1 = new PdfPCell(new Phrase("Food", headFont));
+	        PdfPCell h2 = new PdfPCell(new Phrase("Price", headFont));
+	        PdfPCell h3 = new PdfPCell(new Phrase("Qty", headFont));
+	        PdfPCell h4 = new PdfPCell(new Phrase("Total", headFont));
+
+	        h1.setBackgroundColor(headerColor);
+	        h2.setBackgroundColor(headerColor);
+	        h3.setBackgroundColor(headerColor);
+	        h4.setBackgroundColor(headerColor);
+
+	        h1.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        h2.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        h3.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        h4.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+	        table.addCell(h1);
+	        table.addCell(h2);
+	        table.addCell(h3);
+	        table.addCell(h4);
+
+	        // ====== GET DB DATA ======
+	        List<Map<String,Object>> items =
+	                jdbcTemplate.queryForList(
+	                        "select f.food_name ,bd.price ,bd.qty ,bd.total " +
+	                        "from bill_details bd join food_tbl f " +
+	                        "on bd.food_id=f.food_id where bill_no=?",
+	                        billNo
+	                );
+
+	        double grand = 0;
+
+	        for(Map<String,Object> r : items){
+
+	            PdfPCell c1 = new PdfPCell(new Phrase(r.get("food_name").toString(), normalFont));
+	            PdfPCell c2 = new PdfPCell(new Phrase("₹ " + r.get("price"), normalFont));
+	            PdfPCell c3 = new PdfPCell(new Phrase(r.get("qty").toString(), normalFont));
+	            PdfPCell c4 = new PdfPCell(new Phrase("₹ " + r.get("total"), normalFont));
+
+	            c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+	            c2.setHorizontalAlignment(Element.ALIGN_CENTER);
+	            c3.setHorizontalAlignment(Element.ALIGN_CENTER);
+	            c4.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+	            table.addCell(c1);
+	            table.addCell(c2);
+	            table.addCell(c3);
+	            table.addCell(c4);
+
+	            grand += Double.parseDouble(r.get("total").toString());
+	        }
+
+	        doc.add(table);
+
+	        // ====== GRAND TOTAL ======
+	        Paragraph gt = new Paragraph("Grand Total : ₹" + grand,
+	                new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, BaseColor.RED));
+	        gt.setAlignment(Element.ALIGN_RIGHT);
+	        doc.add(gt);
+
+	        doc.add(new Paragraph("\n"));
+
+	        Paragraph thank = new Paragraph("Thank You! Visit Again ❤️",
+	                new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLUE));
+	        thank.setAlignment(Element.ALIGN_CENTER);
+	        doc.add(thank);
+
+	        doc.close();
+	        out.close();
+
+	    } catch (Exception e){
+	        e.printStackTrace();
+	    }
+	}
+
+
+
 
 	
 }
