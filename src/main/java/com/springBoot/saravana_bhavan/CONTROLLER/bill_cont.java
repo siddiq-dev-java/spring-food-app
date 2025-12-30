@@ -53,30 +53,35 @@ public class bill_cont {
 	@GetMapping("/bill")
 	public String bill_page(Model model, HttpSession session){
 
+	    // 👉 FOOD LIST
 	    model.addAttribute("food_all1", foodRepository.food_all());
 
-	    customer_signup_dto cus = (customer_signup_dto) session.getAttribute("customer");
-	    if(cus == null){
-	        cus = new customer_signup_dto();
-	    }
+	    // 👉 CREATE DTO & FILL FROM SESSION
+	    customer_signup_dto cus = new customer_signup_dto();
+	    cus.setCus_id((String) session.getAttribute("cus_id"));
+	    cus.setCus_name((String) session.getAttribute("cus_name"));
+	    cus.setCus_cell((String) session.getAttribute("cus_cell"));  // if stored, else ignore
 
 	    model.addAttribute("dto", cus);
 
+	    // 👉 CART
 	    List<cart_model> cart = (List<cart_model>) session.getAttribute("cart");
 	    if(cart == null){
 	        cart = new ArrayList<>();
 	    }
 
 	    model.addAttribute("cart", cart);
+
 	    double grand_total = 0;
 	    for(cart_model c : cart){
 	        grand_total += c.getFood_total();
 	    }
-	    model.addAttribute("grand_total", grand_total);
 
+	    model.addAttribute("grand_total", grand_total);
 
 	    return "bill";
 	}
+
 
 
 	
@@ -86,13 +91,12 @@ public class bill_cont {
 	        HttpSession session,
 	        RedirectAttributes ra
 	){
-	    if(dto.getCus_id() == null || dto.getCus_id().isBlank()){
-	        ra.addFlashAttribute("res","❌ Customer ID required");
-	        return "redirect:/bill";
-	    }
+		if(dto.getCus_id() == null || dto.getCus_id().isBlank()){
+		    ra.addFlashAttribute("res","❌ Customer ID Required");
+		    return "redirect:/bill";
+		}
+		session.setAttribute("customer", dto);
 
-	    // Store in session
-	    session.setAttribute("customer", dto);
 
 	    ra.addFlashAttribute("res","✔ Customer Saved");
 	    return "redirect:/bill";
@@ -113,16 +117,16 @@ public class bill_cont {
 	    // ===== GET CUSTOMER FROM SESSION =====
 	    customer_signup_dto cus = (customer_signup_dto) session.getAttribute("customer");
 
-	    if(cus == null || cus.getCus_id() == null || cus.getCus_id().isBlank()){
+	    if(cus == null || cus.getCus_name() == null || cus.getCus_name().isBlank()){
 	        ra.addFlashAttribute("res","❌ Customer not selected. Please save customer first.");
 	        return "redirect:/bill";
 	    }
 
-	    String cus_id = cus.getCus_id();   // Now you have customer id 👍
+	    String cus_name = cus.getCus_name();   // Now you have customer id 👍
 
 
 	    // ===== FOOD VALIDATION =====
-	    if (food_id == null || food_id.isBlank()) {
+	    if (food_name == null || food_name.isBlank()) {
 	        ra.addFlashAttribute("res","❌ Select food");
 	        return "redirect:/bill";
 	    }
@@ -214,7 +218,7 @@ public class bill_cont {
 	    List<cart_model> cart = (List<cart_model>) session.getAttribute("cart");
 	    customer_signup_dto cus = (customer_signup_dto) session.getAttribute("customer");
 
-	    if(cus == null || cus.getCus_id() == null){
+	    if(cus == null || cus.getCus_name() == null){
 	        ra.addFlashAttribute("res","❌ Customer not selected");
 	        return "redirect:/bill";
 	    }

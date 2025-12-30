@@ -9,7 +9,9 @@ import jakarta.persistence.Table;
 public class employee_model {
 	
 	@Id
+	
 	private String emp_id;
+
 	private String emp_name;
 	private String emp_email;
 	private String emp_cell;

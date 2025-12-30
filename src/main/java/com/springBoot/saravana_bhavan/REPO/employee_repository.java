@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.springBoot.saravana_bhavan.project_help.AES;
+import com.springBoot.saravana_bhavan.DTO.employee_signup_dto;
 import com.springBoot.saravana_bhavan.MODEL.employee_model;
 
 
@@ -22,40 +23,33 @@ import jakarta.persistence.EntityManager;
 	public class employee_repository {
 		@PersistenceContext
 		private EntityManager entityManager;
-		
-		public  String employee_signup (String emp_id,String emp_name,
-				String emp_email,String emp_cell,String emp_pass,
-				String emp_role,String idt) {
-			String enc_pass = AES.Encrypt(emp_pass);
-			
-			StoredProcedureQuery sp  = entityManager
-					.createStoredProcedureQuery("sp_emp_ins")
-					.registerStoredProcedureParameter("emp_id",String.class,ParameterMode.IN)
-					.registerStoredProcedureParameter("emp_name",String.class,ParameterMode.IN)
-					.registerStoredProcedureParameter("emp_email",String.class,ParameterMode.IN)
-					.registerStoredProcedureParameter("emp_cell",String.class,ParameterMode.IN)
-					.registerStoredProcedureParameter("emp_pass",String.class,ParameterMode.IN)
-					.registerStoredProcedureParameter("emp_role",String.class,ParameterMode.IN)
-					.registerStoredProcedureParameter("idt",String.class,ParameterMode.OUT)
-					.registerStoredProcedureParameter("res",String.class,ParameterMode.OUT);
-					
-					
-		    sp.setParameter("emp_id", emp_id);
-			sp.setParameter("emp_name", emp_name);
-			sp.setParameter("emp_email", emp_email);
-			sp.setParameter("emp_cell", emp_cell);
-			sp.setParameter("emp_pass", emp_pass);
-			sp.setParameter("emp_role", emp_role);
-			
-			
-			sp.execute();
-			
-			
-					
-			return (String)sp.getOutputParameterValue("res");
+		public String employee_signup(employee_signup_dto dto) {
+
+		    StoredProcedureQuery sp = entityManager
+		            .createStoredProcedureQuery("sp_emp_ins")
+		            .registerStoredProcedureParameter("emp_name", String.class, ParameterMode.IN)
+		            .registerStoredProcedureParameter("emp_email", String.class, ParameterMode.IN)
+		            .registerStoredProcedureParameter("emp_cell", String.class, ParameterMode.IN)
+		            .registerStoredProcedureParameter("emp_pass", String.class, ParameterMode.IN)
+		            .registerStoredProcedureParameter("emp_role", String.class, ParameterMode.IN)
+		            .registerStoredProcedureParameter("idt", String.class, ParameterMode.IN)
+		            .registerStoredProcedureParameter("res", String.class, ParameterMode.OUT);
+
+		    sp.setParameter("emp_name", dto.getEmp_name());
+		    sp.setParameter("emp_email", dto.getEmp_email());
+		    sp.setParameter("emp_cell", dto.getEmp_cell());
+		    sp.setParameter("emp_pass", dto.getEmp_pass());
+		    sp.setParameter("emp_role", dto.getEmp_role());
+
+		    sp.setParameter("idt",
+		            java.time.LocalDateTime.now()
+		            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+		    sp.execute();
+
+		    return (String) sp.getOutputParameterValue("res");
 		}
 
-		
 
 		public  Map<String, String> employee_login(String emp_email, String emp_pass) {
 			
@@ -182,6 +176,25 @@ import jakarta.persistence.EntityManager;
 			            .getResultList();
 			}
 
+
+
+			public employee_model findByEmail(String email){
+
+			    try{
+			        String hql = "SELECT e FROM employee_model e WHERE e.emp_email = :email";
+
+			        return entityManager.createQuery(hql, employee_model.class)
+			                .setParameter("email", email)
+			                .getSingleResult();
+			    }
+			    catch(Exception ex){
+			        System.out.println("❌ EMPLOYEE NOT FOUND");
+			        return null;
+			    }
+			}
+
+			}
+
 	    
 		
 		
@@ -191,4 +204,4 @@ import jakarta.persistence.EntityManager;
 		
 		
 
-}
+

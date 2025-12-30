@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.springBoot.saravana_bhavan.DTO.customer_signup_dto;
 import com.springBoot.saravana_bhavan.MODEL.customer_model;
 import com.springBoot.saravana_bhavan.MODEL.employee_model;
 import com.springBoot.saravana_bhavan.project_help.AES;
@@ -21,39 +22,33 @@ public class customer_repository {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	
-	public  String customer_signup(String cus_id,String cus_name,
-			String cus_email,String cus_cell,String cus_pass,
-			String idt) {
-		String enc_pass = AES.Encrypt(cus_pass);
-		
-		StoredProcedureQuery sp  = entityManager
-				.createStoredProcedureQuery("sp_cus_ins")
-				.registerStoredProcedureParameter("cus_id",String.class,ParameterMode.IN)
-				.registerStoredProcedureParameter("cus_name",String.class,ParameterMode.IN)
-				.registerStoredProcedureParameter("cus_email",String.class,ParameterMode.IN)
-				.registerStoredProcedureParameter("cus_cell",String.class,ParameterMode.IN)
-				.registerStoredProcedureParameter("cus_pass",String.class,ParameterMode.IN)
-				.registerStoredProcedureParameter("idt",String.class,ParameterMode.IN)
-				.registerStoredProcedureParameter("res",String.class,ParameterMode.OUT);
-				
-				
-	    sp.setParameter("cus_id", cus_id);
-		sp.setParameter("cus_name", cus_name);
-		sp.setParameter("cus_email", cus_email);
-		sp.setParameter("cus_cell", cus_cell);
-		sp.setParameter("cus_pass", cus_pass);
-		sp.setParameter("idt", idt);
-		
-		
-		sp.execute();
-		
-		
-				
-		return (String)sp.getOutputParameterValue("res");
+	public String customer_signup(customer_signup_dto dto)
+	         {
+
+	    
+
+	    StoredProcedureQuery sp = entityManager
+	            .createStoredProcedureQuery("sp_cus_ins")
+	            .registerStoredProcedureParameter("cus_name", String.class, ParameterMode.IN)
+	            .registerStoredProcedureParameter("cus_email", String.class, ParameterMode.IN)
+	            .registerStoredProcedureParameter("cus_cell", String.class, ParameterMode.IN)
+	            .registerStoredProcedureParameter("cus_pass", String.class, ParameterMode.IN)
+	            .registerStoredProcedureParameter("idt", String.class, ParameterMode.IN)
+	            .registerStoredProcedureParameter("res", String.class, ParameterMode.OUT);
+
+	    sp.setParameter("cus_name", dto.getCus_name());
+	    sp.setParameter("cus_email", dto.getCus_email());
+	    sp.setParameter("cus_cell", dto.getCus_cell());
+	    sp.setParameter("cus_pass", dto.getCus_pass());  // 🔥 IMPORTANT
+	    sp.setParameter("idt",
+	            java.time.LocalDateTime.now()
+	            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+	    sp.execute();
+
+	    return (String) sp.getOutputParameterValue("res");
 	}
-	
-	
+
 
 	public  Map<String, String> customer_login(String cus_cell, String cus_pass) {
 		

@@ -7,9 +7,7 @@ public class employee_signup_dto {
 	
 
 
-	@NotBlank(message = "enter id---")
-	@Pattern(regexp = "^(?i)e[0-9]+$", message = "ID only starts e1")
-	private String emp_id;
+
 	
 	@NotBlank(message = "enter name---")
 	private String emp_name;
@@ -26,7 +24,7 @@ public class employee_signup_dto {
 	@NotBlank(message = "enter pass---")
 	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{4,}$", message = "Password must have upper,lower,symbol,number----")
 	private String emp_pass;
-	
+	private String emp_id;
 	
 	  private String emp_role; 
 	

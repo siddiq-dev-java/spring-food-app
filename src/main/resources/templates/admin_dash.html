@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Employee Dashboard | Saravana Bhavan</title>
+
+<link rel="stylesheet"
+ href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+<link rel="stylesheet"
+ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+
+body{
+    min-height:100vh;
+    background:radial-gradient(circle at top,#1e3a8a,#020617 70%);
+}
+
+/* NAVBAR */
+.nav-custom{
+    background:linear-gradient(90deg,#0f172a,#020617);
+    box-shadow:0 10px 45px rgba(0,0,0,.8);
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+/* DASH CARD */
+.dash-card{
+    width:450px;
+    border-radius:26px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,.18);
+    backdrop-filter:blur(10px);
+    padding:45px 40px;
+    box-shadow:0 25px 95px rgba(0,0,0,.95);
+    animation:fadeIn .8s ease;
+}
+
+/* Button */
+.btn-dash{
+    border-radius:16px;
+    font-size:18px;
+    font-weight:700;
+    letter-spacing:.4px;
+    transition:.35s;
+    border:none;
+}
+
+.btn-dash:hover{
+    transform:translateY(-5px) scale(1.02);
+    box-shadow:0 15px 40px rgba(0,0,0,.6);
+}
+
+/* FOOTER */
+footer{
+    background:#020617;
+    color:#9ca3af;
+    text-align:center;
+    height:55px;
+    line-height:55px;
+    font-weight:700;
+    letter-spacing:1px;
+    border-top:1px solid rgba(255,255,255,.1);
+}
+
+/* Customer List */
+.cus-box{
+    border-radius:28px;
+    background:white;
+    box-shadow:0 28px 70px rgba(0,0,0,.25);
+    overflow:hidden;
+}
+
+.cus-head{
+    background:#0f172a;
+    color:white;
+    font-weight:900;
+    font-size:20px;
+    padding:14px;
+    letter-spacing:.5px;
+    text-align:center;
+}
+
+.table-clean thead{
+    background:#0ea5e9;
+    color:white;
+}
+
+.table-clean tbody tr{
+    background:#f8fafc;
+    transition:.25s;
+}
+
+.table-clean tbody tr:hover{
+    background:#eef6ff;
+    transform:scale(.999);
+    box-shadow:0 10px 22px rgba(0,0,0,.10);
+}
+
+.table-clean th{
+    padding:14px;
+    font-weight:800;
+}
+
+.table-clean td{
+    padding:14px;
+}
+
+/* Fade Animation */
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(30px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav class="nav-custom d-flex justify-content-between align-items-center px-5 py-3">
+    <h2 class="text-white fw-bold m-0">
+        EMPLOYEE DASHBOARD
+    </h2>
+
+    <a href="/emp_logout"
+       class="btn btn-outline-light fw-bold"
+       onclick="return confirm('Are you sure you want to logout?')">
+       <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+</nav>
+
+<!-- MESSAGE -->
+<div class="container mt-3">
+    <div th:if="${msg}" class="alert alert-success text-center fw-bold shadow-lg">
+        <span th:text="${msg}"></span>
+    </div>
+</div>
+
+<!-- DASH AREA -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height:78vh;">
+    <div class="dash-card text-center">
+
+        <h4 class="fw-bold text-light mb-3">
+            Welcome, <span class="text-info" th:text="${emp_name}">Employee</span> 👋
+        </h4>
+
+        <p class="text-light-50 mb-4 fw-semibold">
+            Choose your action
+        </p>
+
+        <a href="/employee_all"
+           class="btn btn-lg w-100 mb-3 btn-dash"
+           style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:white;">
+           <i class="bi bi-people-fill me-1"></i> All Employees
+        </a>
+
+        <a href="/food"
+           class="btn btn-lg w-100 mb-3 btn-dash"
+           style="background:linear-gradient(135deg,#818cf8,#6366f1);color:white;">
+           <i class="bi bi-egg-fried me-1"></i> Food Menu
+        </a>
+
+        <a href="/emp_reset"
+           class="btn btn-lg w-100 btn-dash"
+           style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;">
+           <i class="bi bi-arrow-counterclockwise me-1"></i> Employee Reset
+        </a>
+
+    </div>
+</div>
+
+<!-- CUSTOMER LIST -->
+<div class="container mb-5">
+    
+<div class="cus-box">
+
+    <div class="cus-head">
+        👥 CUSTOMER LIST
+    </div>
+
+    <div class="p-4 table-responsive">
+
+        <table class="table table-clean text-center align-middle">
+
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="c,stat : ${all_cus}">
+                <td class="fw-bold" th:text="${stat.count}"></td>
+                <td class="text-primary fw-semibold" th:text="${c.cus_id}"></td>
+                <td th:text="${c.cus_name}"></td>
+                <td class="text-muted" th:text="${c.cus_email}"></td>
+                <td class="fw-semibold" th:text="${c.cus_cell}"></td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(all_cus)}">
+                <td colspan="5" class="fw-bold text-danger py-3">
+                    No Customers Found
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+    © 2025 Saravana FOOD | Premium Admin Experience 😎
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

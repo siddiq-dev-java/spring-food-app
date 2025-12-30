@@ -12,8 +12,7 @@ public class food_dto {
 	@NotBlank(message = "enter id---")
 	private String emp_id;
 	
-	@NotBlank(message = "enter id---")
-	@Pattern(regexp = "^(?i)f[0-9]+$", message = "ID only starts f1")
+	
     private String food_id;
 	
 	@NotBlank(message = "enter food---")

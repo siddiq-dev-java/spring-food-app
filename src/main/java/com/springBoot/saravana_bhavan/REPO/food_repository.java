@@ -33,7 +33,7 @@ public class food_repository {
 		
 		StoredProcedureQuery sp  = entityManager
 				.createStoredProcedureQuery("sp_food_ins")
-				.registerStoredProcedureParameter("food_id",String.class,ParameterMode.IN)
+				
 				.registerStoredProcedureParameter("emp_id",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("food_name",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("food_price",String.class,ParameterMode.IN)
@@ -43,7 +43,7 @@ public class food_repository {
 				.registerStoredProcedureParameter("idt",String.class,ParameterMode.IN)
 				.registerStoredProcedureParameter("res",String.class,ParameterMode.OUT);
 				
-	    sp.setParameter("food_id",dto.getFood_id());	
+		
 	    sp.setParameter("emp_id", dto.getEmp_id());
 		sp.setParameter("food_name",dto.getFood_name());
 		sp.setParameter("food_price",dto.getFood_price());
@@ -110,20 +110,22 @@ public class food_repository {
 	
 	
 	
-	public List<food_model>all_food(){
-		StoredProcedureQuery sp = entityManager.createStoredProcedureQuery("sp_food_getall",food_model.class);
-       return sp.getResultList();
-		
-	}
-	
+	public List<food_model> all_food() {
 
-	public List<food_model> food_all1() {
-		
-		return entityManager.createNativeQuery("SELECT * FROM food_tbl ", 
-				food_model.class)
-				.getResultList();
-	
+	    return entityManager.createNativeQuery(
+	        "SELECT * FROM food_tbl ORDER BY CAST(SUBSTRING(food_id, 2, 10) AS INT)",
+	        food_model.class
+	    ).getResultList();
 	}
+
+	
+	public List<food_model> food_all1() {
+	    return entityManager.createNativeQuery(
+	        "SELECT * FROM food_tbl ORDER BY CAST(SUBSTRING(food_id, 2, 10) AS INT)",
+	        food_model.class
+	    ).getResultList();
+	}
+
 
 
 	public  String food_update (food_dto dto) {

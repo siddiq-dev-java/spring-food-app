@@ -112,13 +112,12 @@
                 <form th:action="@{/employee_signup}"
                       method="post"
                       th:object="${employee_signup_dto}">
+					  
+					  <div class="mb-3">
+					  
 
-                    <div class="mb-3">
-                        <label class="fw-bold">Employee ID</label>
-                        <input type="text" class="form-control" th:field="*{emp_id}">
-                        <p th:if="${#fields.hasErrors('emp_id')}"
-                           th:errors="*{emp_id}" class="text-danger"></p>
-                    </div>
+
+               
 
                     <div class="mb-3">
                         <label class="fw-bold">Employee Name</label>

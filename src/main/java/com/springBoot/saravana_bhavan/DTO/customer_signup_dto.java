@@ -7,9 +7,6 @@ public class customer_signup_dto {
 	
 	
 
-	
-	@NotBlank(message = "enter id---")
-	@Pattern(regexp = "^(?i)c[0-9]+$", message = "ID only starts c1")
 	private String cus_id;
 	
 	@NotBlank(message = "enter name---")
@@ -28,6 +25,8 @@ public class customer_signup_dto {
 	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{4,}$", message = "Password must have upper,lower,symbol,number----")
 	private String cus_pass;
 	
+
+
 	
 	
 	public String getCus_id() {

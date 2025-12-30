@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springBoot.saravana_bhavan.DTO.customer_signup_dto;
 import com.springBoot.saravana_bhavan.DTO.food_dto;
@@ -50,7 +51,7 @@ public class food_cont {
 	@GetMapping("/food")
 	public String food(Model model) {
 
-	    List<food_model> food = foodRepository.food_all();
+		 List<food_model> food = foodRepository.food_all1();
 	    List<employee_model> admins = employeeRepository.emp_admin();
 
 	    model.addAttribute("food",food);
@@ -61,64 +62,50 @@ public class food_cont {
 	    return "food";
 	}
 
-	
 	@PostMapping("/insert")
 	public String food_insert(
 	        @Valid @ModelAttribute("dto") food_dto dto,
 	        BindingResult resultBinding,
 	        @RequestParam(value = "pimageFile", required = false) MultipartFile file,
-
+	        RedirectAttributes ra,
 	        Model model) {
 
-	    // validation error
 	    if (resultBinding.hasErrors()) {
 	        model.addAttribute("food", foodRepository.food_all());
 	        model.addAttribute("admins", employeeRepository.emp_admin());
 	        return "food";
 	    }
+
 	    try {
-	        
-	    	if(file != null && !file.isEmpty()) {
+	        if(file != null && !file.isEmpty()){
 
-	    	    String img_name = file.getOriginalFilename();
-	    	    dto.setFood_image(img_name);
+	            String img_name = file.getOriginalFilename();
+	            dto.setFood_image(img_name);
 
-	    	    File folder = new File(img_path);
-	    	    if(!folder.exists()){
-	    	        folder.mkdirs();
-	    	    }
+	            File folder = new File(img_path);
+	            if(!folder.exists()){
+	                folder.mkdirs();
+	            }
 
-	    	    Path path = Paths.get(img_path + File.separator + img_name);
-	    	    Files.copy(file.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+	            Path path = Paths.get(img_path + File.separator + img_name);
+	            Files.copy(file.getInputStream(), path,
+	                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
-	    	    System.out.println("IMAGE STORED SUCCESSFULLY AT : " + path);
-	    	}
-	    	else{
-	    	    System.out.println("NO FILE SELECTED!");
-	    	}
-
-
-	    } catch (Exception e) {
-	    	
-	    	  e.printStackTrace();
-	        model.addAttribute("res", "Error : " + e.getMessage());
-	        model.addAttribute("food", foodRepository.food_all());
-	        model.addAttribute("admins", employeeRepository.emp_admin());
-	        return "food";
+	            System.out.println("IMAGE STORED SUCCESSFULLY AT : " + path);
+	        }
+	    }
+	    catch (Exception e){
+	        e.printStackTrace();
+	        ra.addFlashAttribute("res","Error : " + e.getMessage());
+	        return "redirect:/food";
 	    }
 
-	    // DB insert
 	    String res = foodRepository.food_insert(dto);
 
-	    model.addAttribute("res", res);
-	    model.addAttribute("food", foodRepository.food_all());
-	    model.addAttribute("admins", employeeRepository.emp_admin());
-	    model.addAttribute("food_all1", foodRepository.food_all());
-	    model.addAttribute("dto", new food_dto());
-
-	    return "food";
-
+	    ra.addFlashAttribute("res", res);   
+	    return "redirect:/food";            
 	}
+
 	@PostMapping("/food_search")
 	public String food_search(Model model,
 	                          @RequestParam("food_id") String food_id) {
@@ -132,7 +119,7 @@ public class food_cont {
 
 	    if(food != null){
 
-	        dto.setFood_id(food.getFood_id());
+	    	dto.setFood_id(food_id);
 	        dto.setEmp_id(food.getEmp_id());
 	        dto.setFood_name(food.getFood_name());
 	        dto.setFood_price(String.valueOf(food.getFood_price()));

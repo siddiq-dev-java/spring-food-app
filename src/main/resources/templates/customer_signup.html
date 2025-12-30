@@ -113,12 +113,7 @@
                       method="post"
                       th:object="${customer_signup_dto}">
 
-                    <div class="mb-3">
-                        <label class="fw-bold">Customer ID</label>
-                        <input type="text" class="form-control" th:field="*{cus_id}">
-                        <p th:if="${#fields.hasErrors('cus_id')}"
-                           th:errors="*{cus_id}" class="text-danger"></p>
-                    </div>
+                  
 
                     <div class="mb-3">
                         <label class="fw-bold">Customer Name</label>

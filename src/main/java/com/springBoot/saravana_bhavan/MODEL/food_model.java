@@ -1,6 +1,8 @@
 package com.springBoot.saravana_bhavan.MODEL;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -10,8 +12,10 @@ public class food_model {
 	
 
 			   private String emp_id;
-	           @Id
-	           private String food_id;
+			   @Id
+			
+			   private String food_id;
+
 	           private String food_name;
 	           private String food_price;
 	           private String food_stock;

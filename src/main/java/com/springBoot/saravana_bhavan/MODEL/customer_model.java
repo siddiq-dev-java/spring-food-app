@@ -1,6 +1,8 @@
 package com.springBoot.saravana_bhavan.MODEL;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -9,7 +11,9 @@ import jakarta.persistence.Table;
 public class customer_model {
 	
 	@Id
+	
 	private String cus_id;
+
 
 	private String cus_name;
 	private String cus_email;

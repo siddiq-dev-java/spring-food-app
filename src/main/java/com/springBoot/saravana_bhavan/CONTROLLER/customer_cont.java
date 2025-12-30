@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.convert.DtoInstantiatingConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,50 +35,60 @@ public class customer_cont {
 	private customer_repository customerRepository;
 
 	
-	   @GetMapping("/customer_signup")
-	    public String customer_Signup(Model model) {
-	        model.addAttribute("customer_signup_dto", new customer_signup_dto());
-	        return "customer_signup";
-	    }
+	@GetMapping("/customer_signup")
+	public String signupPage(Model model){
+	    model.addAttribute("customer_signup_dto", new customer_signup_dto());
+	    return "customer_signup";
+	}
+
 	   
 	   
-	    @PostMapping("/customer_signup")
-	    public String customer_signup(@Valid @ModelAttribute("customer_signup_dto") customer_signup_dto cus,
-	                         BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+	   @PostMapping("/customer_signup")
+	   public String customer_signup(
+	           @Valid @ModelAttribute("customer_signup_dto") customer_signup_dto dto,
+	           BindingResult result,
+	           Model model,
+	           RedirectAttributes redirectAttributes) {
 
-	        if(result.hasErrors()) {
-	            return "customer_signup";
-	        }
 
-	        // Encrypt pass
-	        String enc_pass = AES.Encrypt(cus.getCus_pass());
+	       if(result.hasErrors()) {
+	           return "customer_signup";
+	       }
 
-	        // timestamp
-	        String idt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-| HH:mm:ss"));
+	       String idt = LocalDateTime.now()
+	               .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
 
-	        // Call repo
-	        String sp_res = customerRepository.customer_signup(
-	                cus.getCus_id(),
-	                cus.getCus_name(),
-	                cus.getCus_email(),
-	                cus.getCus_cell(),
-	                enc_pass,
-	                idt
-	        );
+	       try {
 
-	        if(sp_res.contains("CUSTOMER DATA inserted")) {
-	            // Flash attribute for redirect → clears form automatically
-	            redirectAttributes.addFlashAttribute("msg", sp_res);
-	            return "redirect:/customer_signup";  // redirect to same page
-	        } else {
-	            model.addAttribute("msg", sp_res);   // show DB error on same page
-	            return "customer_signup";
-	        }
-	    }
-	    
-	    
-	    
-	    
+	           System.out.println("STEP 1 - BEFORE SP CALL");
+	           
+	           String enc_pass = AES.Encrypt(dto.getCus_pass());
+	           dto.setCus_pass(enc_pass);
+
+	           String sp_res = customerRepository.customer_signup(dto);
+	         
+
+	           if(sp_res != null && sp_res.toLowerCase().contains("inserted"))
+	           {
+	               redirectAttributes.addFlashAttribute("msg", sp_res);
+	               return "redirect:/customer_signup";
+	           }
+	           else
+	           {
+	               model.addAttribute("err", sp_res);
+	               return "customer_signup";
+	           }
+
+
+
+	       } catch (Exception e){
+	       
+	           e.printStackTrace();
+	           model.addAttribute("err","Something went wrong");
+	           return "customer_signup";
+	       }
+	   }
+
 	    @GetMapping("/customer_login") 
 	    public String customer_Login(Model model) {
 	    	model.addAttribute("cus", new customer_login_dto());
@@ -116,6 +127,8 @@ public class customer_cont {
 	                //  SESSION SAVE DEFINITELY
 	                session.setAttribute("cus_name", cus_name);
 	                session.setAttribute("cus_id", cus_id);
+	                session.setAttribute("cus_cell", cus_cell);
+
 
 	                System.out.println(" SESSION STORED:");
 	                System.out.println("cus_name = " + cus_name);
@@ -153,14 +166,16 @@ public class customer_cont {
 	        redirectAttributes.addFlashAttribute("msg", "Logout Successfully");
 	        return "redirect:/customer_login";
 	  }
-	    
 	    @GetMapping("/customer_reset")
-	    public String showCustomerReset( Model model) {
+	    public String showCustomerReset(Model model) {
 
-	        model.addAttribute("customer_signup_dto", new customer_signup_dto());
-	        model.addAttribute("res","WELCOME");
-	        return "customer_reset"; 
+	        if(!model.containsAttribute("customer_signup_dto")) {
+	            model.addAttribute("customer_signup_dto", new customer_signup_dto());
+	        }
+
+	        return "customer_reset";
 	    }
+
 
 
 	    @PostMapping("/customer_reset")
@@ -195,16 +210,16 @@ public class customer_cont {
 	    	
 	    	if(cus!=null) {
 	    		customer_signup_dto dto = new customer_signup_dto();
-	    		dto.setCus_id(cus.getCus_id());
+	    		dto.setCus_id(cus_id);
 	    		dto.setCus_name(cus.getCus_name());
 	    		dto.setCus_email(cus.getCus_email());
 	    		dto.setCus_cell(cus.getCus_cell());
 	    		String decryptedPass = AES.Decrypt(cus.getCus_pass());
-
+                dto.setCus_pass(decryptedPass);
 	    		System.out.println("Encrypted from DB: " + cus.getCus_pass());
 	    		System.out.println("Decrypted value   : " + decryptedPass);
 
-	    		dto.setCus_pass(cus_id);
+	    		
 	    		
 	    		model.addAttribute("customer_signup_dto",dto);	
 	    	}
@@ -212,7 +227,7 @@ public class customer_cont {
 	    		model.addAttribute("customer_signup_dto", new customer_signup_dto() );
 	    		
 	    	}
-	    	model.addAttribute("res", resultmsg);
+	    	model.addAttribute("msg", resultmsg);
 	    	return "customer_reset";	
 	    }
 	    
@@ -257,16 +272,22 @@ public class customer_cont {
 	    
 	    
 	    @PostMapping("/customer_delete")
-	    public String employee_delete(HttpSession session,
-	    		Model model ,@RequestParam("cus_id")String cus_id) {
-	    	String response = customerRepository.customer_delete(cus_id);
-	    	
-	    	model.addAttribute("msg",response);
-	    	model.addAttribute("customer_signup_dto",new customer_signup_dto());
-	    	return "customer_reset";
-	    
+	    public String customer_delete(@RequestParam("cus_id") String cus_id,
+	                                  RedirectAttributes ra)
+	    {
+	    	  cus_id = cus_id.trim();
+	        String res = customerRepository.customer_delete(cus_id);
+	        System.out.println("DELETE RESULT = " + res);
+	        if(res != null && res.toLowerCase().contains("success"))
+	            ra.addFlashAttribute("res", res);
+	        else {
+	            ra.addFlashAttribute("res", res);
+
+	        }
+	        return "redirect:/customer_reset";
 	    }
 	    
+
 	    
 	    
 	    

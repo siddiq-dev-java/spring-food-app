@@ -3,7 +3,6 @@ package com.springBoot.saravana_bhavan.CONTROLLER;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,10 @@ import com.springBoot.saravana_bhavan.DTO.employee_login_dto;
 import com.springBoot.saravana_bhavan.DTO.employee_signup_dto;
 import com.springBoot.saravana_bhavan.MODEL.customer_model;
 import com.springBoot.saravana_bhavan.MODEL.employee_model;
+import com.springBoot.saravana_bhavan.MODEL.food_model;
 import com.springBoot.saravana_bhavan.REPO.customer_repository;
 import com.springBoot.saravana_bhavan.REPO.employee_repository;
+import com.springBoot.saravana_bhavan.REPO.food_repository;
 import com.springBoot.saravana_bhavan.project_help.AES;
 
 
@@ -37,6 +38,9 @@ public class employee_cont {
     @Autowired
     private customer_repository customerRepository;
     
+    @Autowired
+    private food_repository foodRepository;
+    
     @GetMapping("/home")
     public String home(){
         return "home";
@@ -51,16 +55,19 @@ public class employee_cont {
     	}
 
     @PostMapping("/employee_login")
-    public String login(@Valid @ModelAttribute("emp") employee_login_dto employee_login_dto,
-                        BindingResult result, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+    public String login(@Valid @ModelAttribute("emp") employee_login_dto dto,
+                        BindingResult result,
+                        Model model,
+                        RedirectAttributes redirectAttributes,
+                        HttpSession session) {
 
         if (result.hasErrors()) {
-        	   System.out.println("❌ Validation Errors");
+            System.out.println("❌ Validation Errors");
             return "employee_login";
         }
 
-        String emp_pass = AES.Encrypt(employee_login_dto.getEmp_pass());
-        String emp_email = employee_login_dto.getEmp_email();
+        String emp_pass = AES.Encrypt(dto.getEmp_pass());
+        String emp_email = dto.getEmp_email();
 
         Map<String, String> emp_log_res = employeeRepository.employee_login(emp_email, emp_pass);
 
@@ -68,42 +75,49 @@ public class employee_cont {
             model.addAttribute("msg", "Invalid Email or Password");
             return "employee_login";
         }
+    
+
+
+        System.out.println("LOGIN RESULT MAP ---> " + emp_log_res);
 
         String res = emp_log_res.get("result");
         String emp_role = emp_log_res.get("emp_role");
         String emp_name = emp_log_res.get("emp_name");
-        System.out.println("👉 SP RETURN RES = " + res);
 
+        if (res != null && res.toLowerCase().contains("sucess")) {
 
-        if (res != null && res.toLowerCase().contains("sucess")) {   
+        	
+            // COMMON SESSION
+            session.setAttribute("emp_name", emp_name);
+            session.setAttribute("emp_role", emp_role);
 
-            if ("admin".equalsIgnoreCase(emp_role)) {
+            // ⭐ Fetch employee full details from DB
+            employee_model emp = employeeRepository.findByEmail(emp_email);
 
-                // ✅ SESSION SAVE DEFINITELY
-                session.setAttribute("emp_name", emp_name);
-                session.setAttribute("emp_role", emp_role);
+            System.out.println("EMP OBJ ---> " + emp);
+            System.out.println("PHONE VALUE ---> " + emp.getEmp_cell());
 
-                System.out.println("✅ SESSION STORED:");
-                System.out.println("emp_name = " + emp_name);
-                System.out.println("emp_role = " + emp_role);
-
-                return "redirect:/employee_dash";
-            } 
-            else {
-                model.addAttribute("msg", "Only admin allowed");
-                return "employee_login";
+            if(emp != null){
+                session.setAttribute("emp_email", emp.getEmp_email());
+                session.setAttribute("emp_cell", emp.getEmp_cell());
+                System.out.println("EMAIL = " + emp.getEmp_email());
+                System.out.println("CELL  = " + emp.getEmp_cell());
             }
 
-        } 
-        else {
-            System.out.println("❌ LOGIN FAILED RES = " + res);
-            model.addAttribute("msg", res);
-            return "employee_login";
+            if ("admin".equalsIgnoreCase(emp_role)) {
+                return "redirect:/admin_dash";
+            } else {
+                return "redirect:/employee_dash";
+            }
         }
-}
-       
 
-    
+        model.addAttribute("msg", res);
+        return "employee_login";
+    }
+
+            
+            
+ 
 
  
     @GetMapping("/employee_signup")
@@ -111,79 +125,112 @@ public class employee_cont {
         model.addAttribute("employee_signup_dto", new employee_signup_dto());
         return "employee_signup";
     }
-
     @PostMapping("/employee_signup")
-    public String signup(@Valid @ModelAttribute("employee_signup_dto") employee_signup_dto emp,
-                         BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    public String signup(
+            @Valid @ModelAttribute("employee_signup_dto") employee_signup_dto emp,
+            BindingResult result,
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
-        if(result.hasErrors()) {
+        if (result.hasErrors()) {
             return "employee_signup";
         }
 
+        // ===== ROLE CHECK =====
         String emp_role = "";
-
-        // Role validate
         if (emp.getEmp_email().contains(".adm@gmail.com")) {
             emp_role = "admin";
-        } else if (emp.getEmp_email().contains(".emp@gmail.com")) {
+        } 
+        else if (emp.getEmp_email().contains(".emp@gmail.com")) {
             emp_role = "employee";
-        } else {
-            model.addAttribute("err","Invalid email format: use .emp@gmail.com or .adm@gmail.com");
+        } 
+        else {
+            model.addAttribute("err", 
+                "Invalid email format. Use .adm@gmail.com for admin or .emp@gmail.com for employee");
             return "employee_signup";
         }
 
-        // Encrypt pass
+        // ===== PASSWORD ENCRYPT =====
         String enc_pass = AES.Encrypt(emp.getEmp_pass());
+        emp.setEmp_pass(enc_pass);
 
-        // timestamp
-        String idt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-| HH:mm:ss"));
+        // ===== ROLE SET =====
+        emp.setEmp_role(emp_role);
 
-        // Call repo
-        String sp_res = employeeRepository.employee_signup(
-                emp.getEmp_id(),
-                emp.getEmp_name(),
-                emp.getEmp_email(),
-                emp.getEmp_cell(),
-                enc_pass,
-                emp_role,
-                idt
-        );
+        // ===== CALL SP USING DTO =====
+        String sp_res = employeeRepository.employee_signup(emp);
 
-        if(sp_res.contains("EMPLOYEE DATA inserted")) {
-            // Flash attribute for redirect → clears form automatically
+        // ===== RESULT HANDLE =====
+        if (sp_res.toLowerCase().contains("inserted")) {
             redirectAttributes.addFlashAttribute("msg", sp_res);
-            return "redirect:/employee_signup";  // redirect to same page
-        } else {
-            model.addAttribute("msg", sp_res);   // show DB error on same page
+            return "redirect:/employee_signup";
+        } 
+        else {
+            model.addAttribute("err", sp_res);
             return "employee_signup";
         }
     }
-    
+
+
     
     @GetMapping("/employee_dash")
-    public String dash(HttpSession session,Model model,
-   		 RedirectAttributes redirectAttributes) {
-    	String emp_name = (String)session.getAttribute("emp_name");
-    	String emp_role= (String)session.getAttribute("emp_role");
-    	
-    	model.addAttribute("emp_role", emp_role);
-    	model.addAttribute("emp_name", emp_name);
-    	
-    	if(emp_name == null) {
-    		redirectAttributes.addFlashAttribute("res","pls login in");
-    		return "redirect:/employee_login";
-    	}
-    	List<customer_model> all_cus =  customerRepository.cus_all();
-    	model.addAttribute("all_cus", all_cus);
-      
+    public String employee_dash(HttpSession session, Model model,
+                                RedirectAttributes redirectAttributes) {
+
+        String emp_name = (String) session.getAttribute("emp_name");
+        String emp_role = (String) session.getAttribute("emp_role");
+
+        if (emp_name == null) {
+            redirectAttributes.addFlashAttribute("res", "Please Login First");
+            return "redirect:/employee_login";
+        }
+
+        model.addAttribute("emp_role", emp_role);
+        model.addAttribute("emp_name", emp_name);
+
+        List<customer_model> all_cus = customerRepository.cus_all();
+        model.addAttribute("all_cus", all_cus);
+
         return "employee_dash";
     }
 
     
     
+    @GetMapping("/admin_dash")
+    public String dash(HttpSession session, Model model,
+                       RedirectAttributes redirectAttributes) {
+
+        String emp_name = (String) session.getAttribute("emp_name");
+        String emp_role = (String) session.getAttribute("emp_role");
+
+        // ❌ Not logged in
+        if (emp_name == null) {
+            redirectAttributes.addFlashAttribute("res", "Please Login First");
+            return "redirect:/employee_login";
+        }
+
+        // ❌ Not Admin - Block panniddu
+        if (emp_role == null || !emp_role.equalsIgnoreCase("admin")) {
+            redirectAttributes.addFlashAttribute("res", "Access Denied ❌");
+            return "redirect:/employee_dash";
+        }
+
+        // 👍 Admin Allowed
+        model.addAttribute("emp_role", emp_role);
+        model.addAttribute("emp_name", emp_name);
+
+        List<customer_model> all_cus = customerRepository.cus_all();
+        model.addAttribute("all_cus", all_cus);
+
+        return "admin_dash";
+    }
+
+
+    
+    
     
     @PostMapping("/emp_reset")
-     public String employee_dash(HttpSession session,Model model,
+     public String admin_dash(HttpSession session,Model model,
     		 RedirectAttributes redirectAttributes) {
     	 
     	 String emp_name =(String)session.getAttribute("emp_name");
@@ -193,7 +240,7 @@ public class employee_cont {
     		 redirectAttributes.addFlashAttribute("res","please login--");
     		 return "redirect:/employee_login";
     	 }
-    	 return "employee_dash";	
+    	 return "admin_dash";	
      }
     
     
@@ -213,7 +260,7 @@ public class employee_cont {
     	
     	if(emp!=null) {
     		employee_signup_dto dto = new employee_signup_dto();
-    		dto.setEmp_id(emp.getEmp_id());
+    		dto.setEmp_id(emp_id);
     		dto.setEmp_name(emp.getEmp_name());
     		dto.setEmp_email(emp.getEmp_email());
     		dto.setEmp_cell(emp.getEmp_cell());
@@ -332,7 +379,52 @@ public class employee_cont {
       redirectAttributes.addFlashAttribute("msg", "Logout Successfully");
       return "redirect:/employee_login";
 }
+   
+   
+   
+   
+   
+   @GetMapping("/employee/profile")
+   public String profile(HttpSession session, Model model){
+
+       String empName = (String) session.getAttribute("emp_name");
+       if(empName == null){
+           return "redirect:/employee_login";
+       }
+
+       String empEmail = (String) session.getAttribute("emp_email");
+       String empCell = (String) session.getAttribute("emp_cell");
+       model.addAttribute("emp_name", empName);
+       model.addAttribute("emp_email", empEmail);
+       model.addAttribute("emp_cell", empCell);
+
+       return "employee_profile";
+   }
+
+   
+   
+   @GetMapping("/employee/foods")
+   public String foods(HttpSession session, Model model){
+
+       if(session.getAttribute("emp_name") == null){
+           return "redirect:/employee_login";
+       }
+
+       List<food_model> list = foodRepository.food_all();
+       model.addAttribute("food_all1", list);
+
+       return "food_list";
+   }
+
+   
+
+
+   
 }
+   
+   
+   
+
     
 
 

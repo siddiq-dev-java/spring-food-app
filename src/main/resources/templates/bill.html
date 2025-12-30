@@ -2,101 +2,99 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>BILL | Saravana Bhavan</title>
+<title>Bill | Saravana Bhavan</title>
 
 <link rel="stylesheet"
  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
 <link rel="stylesheet"
  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <style>
-
 body{
-    background:#eef2ff;
+    background: linear-gradient(135deg,#f8fafc,#e0f2fe);
+    min-height:100vh;
 }
 
-/* TOP NAV */
+/* NAV BAR */
 .navbar{
-    background:#0f172a;
-    box-shadow:0 10px 35px rgba(0,0,0,.45);
+    background: linear-gradient(to right,#2563eb,#38bdf8);
+    box-shadow:0 10px 35px rgba(0,0,0,.25);
 }
-.page-title{
-    font-weight:800;
+.title{
+    font-weight:900;
     color:white;
-    letter-spacing:.5px;
 }
 
-/* CARDS */
+/* GLASS CARD */
 .card-box{
     background:white;
     border-radius:18px;
-    padding:22px;
-    box-shadow:0 12px 35px rgba(0,0,0,.12);
+    padding:25px;
+    border:1px solid #cbd5e1;
+    box-shadow:0 12px 40px rgba(0,0,0,.15);
 }
 
-/* TITLES */
+/* SECTION TITLE */
 .section-title{
-    font-weight:900;
+    font-weight:800;
     color:#0f172a;
-    letter-spacing:.3px;
+}
+
+/* CUSTOMER BOX */
+.customer-box{
+    background:#f8fafc;
+    border-radius:18px;
+    padding:20px;
+    border:1px solid #cbd5e1;
+}
+
+.customer-input{
+    background:#eef2ff !important;
+    border:1px solid #93c5fd !important;
+    font-weight:600;
 }
 
 /* TABLE */
 thead{
-    background:#0ea5e9;
+    background:#2563eb;
     color:white;
 }
 tbody tr:hover{
-    background:#f0f9ff !important;
+    background:#f1f5ff !important;
 }
 
-/* IMAGE */
+/* FOOD IMAGE */
 .food-img{
-    width:85px;
-    height:85px;
+    width:80px;
+    height:80px;
     border-radius:14px;
-    object-fit:cover;
+    border:2px solid #38bdf8;
 }
 
-/* INPUT */
-input{
-    background:#f3f4f6;
-}
-
-/* BUTTON */
+/* BUTTONS */
 .btn-accent{
-    background:#0ea5e9;
+    background:#2563eb;
     color:white;
-    border:none;
+    font-weight:700;
+    border-radius:10px;
+}
+.btn-accent:hover{
+    background:#60a5fa;
+}
+
+.btn-generate{
+    background:#16a34a;
+    color:white;
     font-weight:800;
     border-radius:12px;
 }
-.btn-accent:hover{
-    background:#38bdf8;
-    transform:translateY(-1px);
-}
-
-footer{
-    margin-top:40px;
-    height:55px;
-    background:#020617;
-    color:white;
-    text-align:center;
-    line-height:55px;
-    font-weight:700;
+.btn-generate:hover{
+    background:#4ade80;
 }
 
 .table-dark{
     background:#0f172a !important;
-}
-
-.badge-tag{
-    background:#cffafe;
-    color:#0f172a;
-    padding:5px 10px;
-    border-radius:10px;
-    font-weight:700;
+    color:white;
 }
 
 </style>
@@ -104,28 +102,29 @@ footer{
 
 <body>
 
-<nav class="navbar d-flex justify-content-between px-5 py-3">
-    <h2 class="page-title">Bill Management</h2>
+<nav class="navbar px-5 py-3 d-flex justify-content-between">
+<h2 class="title">🍿  Billing </h2>
 
-    <a href="/customer_dash" class="btn btn-light fw-bold">
-        <i class="bi bi-arrow-left"></i> Back
-    </a>
+<a href="/customer_dash" class="btn btn-light fw-bold">
+<i class="bi bi-arrow-left"></i> Back
+</a>
 </nav>
+
 
 <div class="container mt-4">
 
-<div th:if="${res}" class="alert alert-info text-center fw-bold shadow">
-    <span th:text="${res}"></span>
+<div th:if="${res}" class="alert alert-warning text-center fw-bold shadow">
+<span th:text="${res}"></span>
 </div>
 
-<div class="row mt-3">
+<div class="row">
 
-<!-- ================= LEFT ================= -->
+<!-- LEFT -->
 <div class="col-md-5">
 <div class="card-box">
 
 <h4 class="section-title">
-    Food List <span class="badge-tag">Available</span>
+Food Menu <span class="badge-tag">Available</span>
 </h4>
 
 <div class="table-responsive mt-3">
@@ -137,12 +136,13 @@ footer{
 <th>Name</th>
 <th>Price</th>
 <th>Stock</th>
-<th>Image</th>
+<th>Img</th>
 <th></th>
 </tr>
 </thead>
 
 <tbody>
+
 <tr th:each="f : ${food_all1}">
 <td th:text="${f.food_id}"></td>
 <td th:text="${f.food_name}"></td>
@@ -150,10 +150,11 @@ footer{
 <td th:text="${f.food_stock}"></td>
 
 <td>
-<img th:if ="${f.food_image != null}"
+<img th:if="${f.food_image != null}"
      th:src="@{'/uploads/food/' + ${f.food_image}}"
      class="food-img">
-<span th:if ="${f.food_image == null}" style="color:gray">
+
+<span th:if="${f.food_image == null}" style="color:gray">
 No Image
 </span>
 </td>
@@ -177,92 +178,124 @@ No Image
 </div>
 </div>
 
-
-<!-- ================= RIGHT ================= -->
+<!-- RIGHT -->
 <div class="col-md-7">
-<div class="card-box">
 
-<h4 class="section-title">Customer Details</h4>
+    <style>
+        .customer-box{
+            background: linear-gradient(135deg,#ffffff,#f0faff);
+            border-radius:18px;
+            padding:25px;
+            border:2px solid #dbeafe;
+            box-shadow:0 25px 45px rgba(0,0,0,.15);
+        }
 
-<form th:object="${dto}" method="post" action="/save_bill" class="mt-2">
+        .section-title{
+            font-weight:900;
+            color:#0f172a;
+            letter-spacing:1px;
+        }
 
-<div class="mb-2">
-<label class="fw-bold">Customer ID</label>
-<input type="text" class="form-control" th:field="*{cus_id}">
-</div>
+        .customer-text p{
+            font-size:20px;
+            font-weight:900;
+            letter-spacing:.5px;
+            margin-bottom:12px;
+        }
 
-<div class="mb-2">
-<label class="fw-bold">Customer Name</label>
-<input type="text" class="form-control" th:field="*{cus_name}">
-</div>
+        .cid{
+            color:#2563eb;
+        }
+        .cname{
+            color:#16a34a;
+        }
+        .cphone{
+            color:#e11d48;
+        }
+    </style>
 
-<div class="mb-2">
-<label class="fw-bold">Phone</label>
-<input type="text" class="form-control" th:field="*{cus_cell}">
-</div>
 
-<button class="btn btn-accent w-100">
-Save & Continue
-</button>
+    <!-- ================= CUSTOMER DETAILS ================= -->
+    <div class="customer-box">
 
-</form>
+        <h4 class="section-title">
+            👤 Customer Details
+        </h4>
 
-<hr>
+        <div class="customer-text mt-3">
 
-<!-- ================= FOOD SELECT ================= -->
+            <p>
+                Customer ID :
+                <span class="cid" th:text="${dto.cus_id}"></span>
+            </p>
+
+            <p>
+                Customer Name :
+                <span class="cname" th:text="${dto.cus_name}"></span>
+            </p>
+
+            <p>
+                Customer Phone :
+                <span class="cphone" th:text="${dto.cus_cell}"></span>
+            </p>
+
+        </div>
+
+    </div>
+
+    <hr>
+
 <h4 class="section-title">Select Food</h4>
 
-<form class="mt-2" method="post" action="/bill_insert">
+<form method="post" action="/bill_insert">
 
 <input type="hidden" name="cus_id"
        th:value="${session.customer != null} ? ${session.customer.cus_id} : ''">
 
 <div class="row">
 <div class="col-md-6 mb-2">
-<label class="fw-bold">Food ID</label>
+<label>Food ID</label>
 <input id="food_id" name="food_id" class="form-control" readonly>
 </div>
 
 <div class="col-md-6 mb-2">
-<label class="fw-bold">Food</label>
+<label>Food</label>
 <input id="food_name" name="food_name" class="form-control" readonly>
 </div>
 </div>
 
 <div class="row">
 <div class="col-md-6 mb-2">
-<label class="fw-bold">Price</label>
+<label>Price</label>
 <input id="food_price" name="food_price" class="form-control" readonly>
 </div>
 
 <div class="col-md-6 mb-2">
-<label class="fw-bold">Quantity</label>
-<input type="number" id="food_quantity" name="food_qty"
-       class="form-control" min="1">
+<label>Qty</label>
+<input id="food_quantity" name="food_qty"
+       type="number" class="form-control">
 </div>
 </div>
 
 <div class="mb-2">
-<label class="fw-bold">Total</label>
+<label>Total</label>
 <input id="food_total" name="food_total"
        class="form-control" readonly>
 </div>
 
-<button class="btn btn-accent w-100">
-Add to Cart
-</button>
+<button class="btn btn-accent w-100">Add to Cart</button>
 
 </form>
 
 <hr>
 
-<h4 class="section-title">🛒 Cart Items</h4>
+<h4 class="section-title">🛒 Cart</h4>
 
-<div class="table-responsive mt-2">
 <table class="table table-bordered text-center align-middle">
+
 <thead class="table-dark">
 <tr>
-<th>S.No</th>
+<th>No</th>
 <th>Food</th>
 <th>Price</th>
 <th>Qty</th>
@@ -282,31 +315,27 @@ Add to Cart
 
 <td>
 <a th:href="@{'/cart_delete?index=' + ${stat.index}}"
-   class="btn btn-danger btn-sm">
-Delete
-</a>
+class="btn btn-danger btn-sm">X</a>
 </td>
 </tr>
 
 <tr th:if="${#lists.isEmpty(cart)}">
 <td colspan="6" class="fw-bold text-danger">
-No items added yet
+Cart Empty
 </td>
 </tr>
 
 </tbody>
 </table>
-</div>
-
 
 <div class="mb-2">
-<label class="fw-bold">Grand Total</label>
+<label>Grand Total</label>
 <input id="grand_total" class="form-control"
        th:value="${grand_total}" readonly>
 </div>
 
 <form action="/generate_bill" method="post">
-<button class="btn btn-primary w-100">
+<button class="btn btn-generate w-100">
 Generate Bill
 </button>
 </form>
@@ -317,18 +346,18 @@ Generate Bill
 </div>
 </div>
 
-
 <footer>
-© 2025 Saravana FOOD | Designed Smart 😎
+Netflix Style Built 😎 — Saravana Bhavan 2025
 </footer>
 
 
 <script>
+
 function selectFood(btn){
  document.getElementById("food_id").value = btn.getAttribute("data-id");
  document.getElementById("food_name").value = btn.getAttribute("data-name");
  document.getElementById("food_price").value = btn.getAttribute("data-price");
- document.getElementById("food_quantity").value = "";
+ document.getElementById("food_quantity").value = "1";
  document.getElementById("food_total").value = "";
 }
 
@@ -337,11 +366,12 @@ const price = document.getElementById("food_price");
 const total = document.getElementById("food_total");
 
 function calculateTotal(){
- const p = parseFloat(price.value) || 0;
- const q = parseInt(qty.value) || 0;
- total.value = p * q;
+ const p = parseFloat(price.value)||0;
+ const q = parseInt(qty.value)||0;
+ total.value = p*q;
 }
 qty.addEventListener("input", calculateTotal);
+
 </script>
 
 </body>
